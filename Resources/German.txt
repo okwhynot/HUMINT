@@ -1,0 +1,17 @@
+MALE_FIRST: "Abbo","Abo","Achim","Adalbald","Adalbold","Adalbert","Adelbert","Alberich","Elberich","Albert","Albrecht","Albrun","Amalbert",
+"Amalfried","Ambros","Andreas","Adrian","Alexander","Agilbert","Amadeus","Anselm","Anshelm","Archibald","Armin","Arndt","Axel","Bertold",
+"Björn","Arnulf","Artur","Bernhard","Bert","Bruno","Karl","Christian","Cristof","Klemens","Konrad","Dierk","Emmerich","Erich","Ernst",
+"Ferdinand","Florian","Friedrich","Gabriel","Georg","Gerald","Gerhart","Gerolf","Gerwig","Hans";
+
+FEMALE_FIRST: "Ada","Adda","Adalberta","Alberta","Amalberta","Amalfrieda","Amalie","Amalia","Andrea","Adriane","Alexandra","Alessandra",
+"Alheide","Angela","Angelika","Anita","Anna","Anne","Agathe","Agatha","Antoinette","Arabella","Asta","Astrid","Augusta","Beate","Barbara",
+"Beatrice","Berta","Brigitte","Charlotte","Christiane","Danielle","Effi","Emma","Erika","Erma","Frauke","Geli","Geralde","Gerda","Gertraude",
+"Gertrude","Hadelinde";
+
+LAST: "Müller","Schmidt","Schneider","Fischer","Weber","Schäfer","Meyer","Wagner","Becker","Bauer","Hoffmann","Schulz","Koch","Richter",
+"Klein","Wolf","Schröder","Neumann","Braun","Werner","Schwarz","Hofmann","Zimmermann","Hartmann","Schmid","Schmitz","Krüger","Lange",
+"Maier","Beck","König","Krause","Schulze","Huber","Mayer","Lehmann","Kaiser","Fuchs","Herrmann","Lang","Thomas","Peters","Stein","Jung",
+"Möller","Martin","Friedrich","Scholz","Keller","Hahn","Roth","Günther","Vogel","Schubert","Winkler","Schuster","Jäger","Lorenz",
+"Ludwig","Baumann","Heinrich","Otto","Simon","Graf","Kraus","Krämer","Böhm","Schulte","Albrecht","Franke","Winter","Schumacher","Vogt",
+"Haas","Sommer","Schreiber","Engel","Ziegler","Dietrich","Brandt","Seidel","Kuhn","Busch","Horn","Arnold","Kühn","Bergmann","Pohl",
+"Pfeiffer","Wolff","Voigt","Sauer";

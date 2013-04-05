@@ -1,0 +1,66 @@
+{
+	name: Survival Knife;
+	id: 23101;
+	damage:;
+}
+{
+	name: Makarov PM;
+	id: 23201;
+	ammo: 9x18mm Makarov;
+	damage:;
+	attach:;
+}
+{
+	name: Walther PPK;
+	id: 23202;
+	ammo: 7.65x17mm Browning SR (.32 ACP);
+	damage:;
+	attach:;
+}
+{
+	name: Walther P5;
+	id: 23203;
+	ammo: 9x19mm Parabellum;
+	damage:;
+	attach:;
+}
+{
+	name: Walther P38;
+	id: 23204;
+	ammo: 9×19mm Parabellum;
+	damage:;
+	attach:;
+}
+{
+	name: PSM;
+	id: 23205;
+	ammo: 5.45x18mm;
+	damage:;
+	attach:;
+}
+{
+	name: Sauer 38H;
+	id: 23206;
+	ammo:;
+	damage:;
+	attach:;
+}
+{
+	name: Tokarev T-33;
+	id: 23207;
+	ammo:;
+	damage:;
+	attach:;
+}
+{
+	name: Stechkin APS;
+	id: 23208;
+	ammo:;
+	damage:;
+	attach:;
+}
+{
+	name: 5.45x18mm Mag;
+	id: 25101;
+	capacity: 12;
+}
