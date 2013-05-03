@@ -64,3 +64,27 @@
 	id: 25101;
 	capacity: 12;
 }
+{
+	name: Winter jacket;
+	id: 22201;
+	prot:;
+	weight:;
+}
+{
+	name: Worker's shirt;
+	id: 22301;
+	prot:;
+	weight:;
+}
+{
+	name: Worker's pants;
+	id: 22401;
+	prot:;
+	weight:;
+}
+{
+	name: Worker's boots;
+	id: 22501;
+	prot:;
+	weight:;
+}

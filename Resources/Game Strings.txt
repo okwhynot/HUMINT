@@ -1,0 +1,59 @@
+# GENERAL
+title = HUMAN INTELLIGENCE
+subtitle = HUMINT
+commandant = Karl-Heinz Drews
+# FACTIONS
+staasi = Staatssicherheit
+staasi_s = Staasi
+cia = Central Intelligence Agency
+cia_s = CIA
+# NEIGHBORHOODS
+friedrichshain = Friedrichshain
+kopenick = Köpenick
+lichtenberg = Litchenberg
+marzahn = Marzahn
+mitte = Mitte
+pankow = Pankow
+prenzlaur_berg = Prenzlaur Berg
+treptow = Treptow
+weissensee = Weissensee
+# CALENDAR
+january = Januar
+february = Februar
+march = Marz
+april = April
+may = Kann
+june = Juni
+july = Juli
+august = August
+september = September
+october = Oktober
+november = November
+december = Dezember
+winter = Winter
+spring = Spring
+summer = Summer
+autumn = Autumn
+# MAIN MENU
+ng_button = New Asset
+lg_button = Review Dossier
+am_button = Agent Memorial
+aa_button = Agency Archive
+go_button = Settings
+ab_button = About HUMINT
+re_button = Retire
+# CHARACTER CREATOR
+bezirk = Bezirk
+season = Season
+faction = Faction
+specialization = Specialization
+gender = Gender
+# WEAPONS
+makarov = Makarov PM
+ppk = Walther PPK
+p5 = Walther P5
+p38 = Walther P38
+psm = PSM
+sauer38 = Sauer 38H
+t33 = Tokarev T-33
+aps = Stechkin APS

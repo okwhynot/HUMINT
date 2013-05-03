@@ -4,13 +4,12 @@ using System.Collections;
 using libhumint;
 
 public class HUMINT_Game : MonoBehaviour {
-	public enum UI_States {Game,Inventory,Character,Map};
-	public UI_States uistate = UI_States.Game;
-	Overlay over;
-	public GameArea game;
+	public bool gameIsPaused;
+	public Interface iface;
 	GameObject player;
 	
 	void Awake() {
+		Screen.SetResolution(620,240,false);
 		if(GameObject.FindWithTag("Player") == null)
 			player = (GameObject)Instantiate(Resources.Load("Player_DEBUG"));
 		else
@@ -18,42 +17,55 @@ public class HUMINT_Game : MonoBehaviour {
 	}
 	
 	void Start() {
-		GameObject.Find("Main Camera").GetComponent<HUMINT_World>().worldMap = GameObject.Find("Main Camera").GetComponent<HUMINT_World>().wMap();
-		over = new Overlay();
-		game = new GameArea();
+		iface = new Interface(player.GetComponent<HUMINT_Object>().player,player.GetComponent<HUMINT_Object>());
 	}
 	
 	void Update() {
-		player.GetComponent<HUMINT_Object>().player.Movement();
-		if(Input.GetKeyDown("i"))
-			uistate = UI_States.Inventory;
-	}
-	
-	void OnGUI() {
-		switch(uistate)
-		{
-			case UI_States.Game:
-			{
-				over.Draw();
-				game.Draw();
+		//Only do player movement when unpaused & out of menus
+		switch(iface.state) {
+			case Interface.State.Game: {
+				GUIHotkeys();
 				break;
 			}
-			case UI_States.Inventory:
-			{
+			case Interface.State.Inventory: {
 				break;
 			}
-			case UI_States.Character:
-			{
-				break;
-			}
-			case UI_States.Map:
-			{
+			case Interface.State.Character: {
 				break;
 			}
 		}
+		if(gameIsPaused == false)
+			player.GetComponent<HUMINT_Object>().player.Movement();
+		GUIHotkeys();
+	}
+	
+	void OnGUI() {
+		iface.Draw();
 	}
 	//Actions should ONLY be performed during a pulse.
 	public void Pulse() {
-		game.Refresh();
+		iface.Refresh();
+	}
+	
+	void GUIHotkeys() {
+		if(Input.GetKeyDown("space"))
+			gameIsPaused = !gameIsPaused;
+		else if(Input.GetKeyDown("i"))
+		{
+			//iface.state = Interface.State.Inventory;
+			//iface.Initialize();
+		}
+		else if(Input.GetKeyDown("c"))
+		{
+			//iface.state = Interface.State.Character;
+			//iface.Initialize();
+		}
+		else if(Input.GetKeyDown("m"))
+		{
+			//iface.state = Interface.State.Map;
+			//iface.Initialize();
+		}
+		if(Input.anyKeyDown)
+			Pulse();
 	}
 }

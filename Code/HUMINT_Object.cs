@@ -12,15 +12,16 @@ public class HUMINT_Object : MonoBehaviour {
 	//1 = Player, 2 = Object, 3 = Entity
 	//21 = World Obj, 22 = Clothes, 23 = Weapons, 24 = Gadgets, 25 = Ammo
 	//231 = Melee, 232 = Pistol, 233 = Rifle
+	//221 = hat, 222 = jacket, 223 = shirt, 224 = gloves, 225 = pants, 226 = shoes
 	//For world objects, the second digit determines whether or not it blocks movement and line of sight.
-	public enum Type {Player,Object,Entity};
+	public enum Type {Player,Object,NPC};
 	public Type type;
 	public Vector2 Coordinates;
 	public string name;
 	public int id;
 	public Item item;
 	public Player player;
-	public Entity entity;
+	public NPC other;
 	public Vector2 curMap;
 	
 	public void Create(string name, int id, int[] ccval = null, int[] vsval = null,Vector2 curMap = new Vector2()) {
@@ -43,9 +44,9 @@ public class HUMINT_Object : MonoBehaviour {
 				item = new Item(idS2);
 				break;
 			}
-			case Type.Entity:
+			case Type.NPC:
 			{
-				entity = new Entity();
+				other = new NPC();
 				break;
 			}
 		}
@@ -58,12 +59,18 @@ public class HUMINT_Object : MonoBehaviour {
 	}
 	public class Entity {
 		public enum Sex {Male,Female};
+		public int hp;
+		//public GameObject equippedWeapon;
+		//public GameObject equippedHat,equippedShirt,equippedGloves,equippedPants,equippedShoes;
+		//weapon, hat, jacket, shirt, gloves, pants, shoes
+		public GameObject[] equipped = new GameObject[7];
 		public Sex sex;
 		public int age;
 		public int btype;
 		public int cob;
 		public DateTime dob;
 		public Entity() {
+			hp = 100;
 			sex = (Sex)UnityEngine.Random.Range(0,2);
 			cob = UnityEngine.Random.Range(0,UIStrings.CityNames.Length);
 			btype = UnityEngine.Random.Range(0,UIStrings.BloodTypes.Length);
@@ -76,6 +83,7 @@ public class HUMINT_Object : MonoBehaviour {
 		public Spec spec;
 		int[] visual;
 		public Container playerInventory;
+		public bool wpnHolstered = true;
 		public Player(int[] ccval,int[] vsval) : base() {
 			sex = (Sex)ccval[4];
 			spec = (Spec)ccval[3];
@@ -83,11 +91,23 @@ public class HUMINT_Object : MonoBehaviour {
 			age = vsval[5];
 			dob = new DateTime(1980-age,1,UnityEngine.Random.Range(1,31));
 			Debug.Log(dob.Day+"/"+dob.Month+"/"+dob.Year);
-			playerInventory = new Container(8);
+			playerInventory = new Container(8,GameObject.FindWithTag("Player"));
 			StartingGear();
 		}
 		void StartingGear() {
 			GameObject p = GameObject.FindWithTag("Player");
+			GameObject jacket = (GameObject)Instantiate(GameObject.Find("Winter jacket (G)"));
+			GameObject shirt = (GameObject)Instantiate(GameObject.Find("Worker's shirt (G)"));
+			GameObject pants = (GameObject)Instantiate(GameObject.Find("Worker's pants (G)"));
+			GameObject shoes = (GameObject)Instantiate(GameObject.Find("Worker's boots (G)"));
+			playerInventory.Add(jacket,p);
+			playerInventory.Add(shirt,p);
+			playerInventory.Add(pants,p);
+			playerInventory.Add(shoes,p);
+			equipped[2] = jacket;
+			equipped[3] = shirt;
+			equipped[5] = pants;
+			equipped[6] = shoes;
 			switch(spec)
 			{
 				case Spec.Pistols:
@@ -102,6 +122,7 @@ public class HUMINT_Object : MonoBehaviour {
 					playerInventory.Add(amm2,p);
 					playerInventory.Add(amm3,p);
 					playerInventory.Add(knife,p);
+					equipped[0] = wpn;
 					break;
 				}
 				case Spec.Explosives:
@@ -122,118 +143,83 @@ public class HUMINT_Object : MonoBehaviour {
 		}
 		public void Movement() {
 			GameObject p = GameObject.FindWithTag("Player");
-			HUMINT_Game hgame = GameObject.Find("Main Camera").GetComponent<HUMINT_Game>();
-			HUMINT_World hworld = GameObject.Find("Main Camera").GetComponent<HUMINT_World>();
-			Vector2 pCoords = p.GetComponent<HUMINT_Object>().Coordinates;
-			Vector2 cMap = p.GetComponent<HUMINT_Object>().curMap;
-			if(Input.GetKeyDown("up"))
-			{
-				if(pCoords.y-1 == -1)
-				{
-					hworld.ChangeMap('^');
-					hgame.Pulse();
-				}
-				if(hworld.worldMap[(int)cMap.x,(int)cMap.y].collisionMap[(int)pCoords.x,(int)pCoords.y-1] == true)
+			HUMINT_World hworld = Camera.main.GetComponent<HUMINT_World>();
+			int pX = (int)p.GetComponent<HUMINT_Object>().Coordinates.x;
+			int pY = (int)p.GetComponent<HUMINT_Object>().Coordinates.y;
+			if(Input.GetKeyDown("up")) {
+				if(hworld.world.z1[pX,pY-1].canMoveTo)
 					p.GetComponent<HUMINT_Object>().Coordinates.y-=1;
-				//hgame.Pulse();
+				else if(hworld.world.z1[pX,pY-1].isDoor)
+					hworld.world.z1[pX,pY-1].Open();
 			}
-			else if(Input.GetKeyDown("down"))
-			{
-				if(pCoords.y+1 == 18)
-				{
-					hworld.ChangeMap('v');
-					hgame.Pulse();
-				}
-				if(hworld.worldMap[(int)cMap.x,(int)cMap.y].collisionMap[(int)pCoords.x,(int)pCoords.y+1] == true)
-				{
+			if(Input.GetKeyDown("down")) {
+				if(hworld.world.z1[pX,pY+1].canMoveTo)
 					p.GetComponent<HUMINT_Object>().Coordinates.y+=1;
-					//hgame.Pulse();
-				}
+				else if(hworld.world.z1[pX,pY+1].isDoor)
+					hworld.world.z1[pX,pY+1].Open();
 			}
-			else if(Input.GetKeyDown("right"))
-			{
-				if(hworld.worldMap[(int)cMap.x,(int)cMap.y].collisionMap[(int)pCoords.x+1,(int)pCoords.y] == true)
-					p.GetComponent<HUMINT_Object>().Coordinates.x+=1;
-				//hgame.Pulse();
-			}
-			else if(Input.GetKeyDown("left"))
-			{
-				if(hworld.worldMap[(int)cMap.x,(int)cMap.y].collisionMap[(int)pCoords.x-1,(int)pCoords.y] == true)
+			if(Input.GetKeyDown("left")) {
+				if(hworld.world.z1[pX-1,pY].canMoveTo)
 					p.GetComponent<HUMINT_Object>().Coordinates.x-=1;
-				//hgame.Pulse();
+				else if(hworld.world.z1[pX-1,pY].isDoor)
+					hworld.world.z1[pX-1,pY].Open();
 			}
-			if(Input.GetKeyDown("up") || Input.GetKeyDown("down") || Input.GetKeyDown("left") || Input.GetKeyDown("right"))
-				hgame.Pulse();
-		}
-	}
-	[System.Serializable]
-	public class Item {
-		public enum Subtype {WorldObject,Clothing,Weapon,Gadget,Ammo};
-		public Subtype itemType;
-		public bool isHeld,doesStack,canPickUp;
-		public Item(int subtype) {
-			itemType = (Subtype)subtype-1;
-			switch(itemType)
-			{
-				case Subtype.Weapon:
-				{
-					doesStack = false;
-					canPickUp = true;
-					break;
-				}
-				case Subtype.Ammo:
-				{
-					doesStack = true;
-					canPickUp = true;
-					break;
-				}
+			if(Input.GetKeyDown("right")) {
+				if(hworld.world.z1[pX+1,pY].canMoveTo)
+					p.GetComponent<HUMINT_Object>().Coordinates.x+=1;
+				else if(hworld.world.z1[pX+1,pY].isDoor)
+					hworld.world.z1[pX+1,pY].Open();
 			}
 		}
 	}
-	public class Weapon {
+	public class NPC : Entity {
 		
-	}
-	public class Magazine {
-		
-	}
-	public class WorldObject {
-		public bool blockMovement,blockSight;
 	}
 	[System.Serializable]
 	public class Container {
 		public GameObject[][] contents;
+		public GameObject parent;
 		int cSlot;
-		public Container(int size) {
+		public Container(int size, GameObject par) {
+			parent = par;
 			contents = new GameObject[size][];
 			for(int i=0;i<size;i++)
 				contents[i] = new GameObject[10];
-		}		
+		}
 		public void Add(GameObject toAdd,GameObject to) {
 			toAdd.name = toAdd.GetComponent<HUMINT_Object>().name;
 			toAdd.GetComponent<HUMINT_Object>().item.isHeld = true;
 			toAdd.transform.parent = to.transform;
-			//SETUP TAGS TOO
-			for(int i=0;i<contents.Length;i++)
-			{
-				if(contents[i][0] == null)
-				{
-					contents[i][0] = toAdd;
-					break;
-				}
-				else if(contents[i][0].name == toAdd.name)
-				{
-					for(int x=0;x<10;x++)
-						if(contents[i][x] == null)
-						{
-							contents[i][x] = toAdd;
-							break;
-						}
-					break;
-				}
-			}		
 		}
 		public void Remove() {
 			
+		}
+	}
+}
+[System.Serializable]
+public struct Item {
+	public enum Subtype {WorldObject,Clothing,Weapon,Gadget,Ammo};
+	public Subtype itemType;
+	public bool isHeld,doesStack,canPickUp;
+	public Item(int subtype) {
+		isHeld = false; //placeholder values
+		doesStack = true; //placeholder values
+		canPickUp = true; //placeholder values
+		itemType = (Subtype)subtype-1;
+		switch(itemType)
+		{
+			case Subtype.Weapon:
+			{
+				doesStack = false;
+				canPickUp = true;
+				break;
+			}
+			case Subtype.Ammo:
+			{
+				doesStack = true;
+				canPickUp = true;
+				break;
+			}
 		}
 	}
 }

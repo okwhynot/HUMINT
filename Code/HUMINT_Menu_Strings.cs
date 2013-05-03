@@ -28,6 +28,7 @@ public static class UIStrings {
 	//In-Game
 	public static string[] IGMenuTitles = {"INFO","HOTKEYS"};
 	public static string[] IGMenu = {"attack","character","holster","interact","inventory","map","operations"};
+	public static string[] Holstered = {"unholstered","holstered"};
 }
 public static class WeaponStrings {
 	//Modifiers
