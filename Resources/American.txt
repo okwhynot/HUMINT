@@ -1,0 +1,14 @@
+MALE_FIRST: "James","Michael","Robert","John","David","William","Richard","Thomas","Mark","Charles","Steven","Gary","Joseph",
+"Donald","Ronald","Kenneth","Paul","Larry","Daniel","Stephen","Dennis","Timothy","Edward","Jeffrey","George","Gregory","Kevin",
+"Douglas","Terry","Anthony","Jerry","Bruce","Randy","Brian","Frank","Scott","Roger","Raymond","Peter","Patrick","Keith","Lawrence",
+"Wayne","Danny","Alan","Gerald","Ricky","Carl","Christopher","Dale","Walter","Willie";
+
+FEMALE_FIRST: "Mary","Linda","Patricia","Susan","Deborah","Barbara","Debra","Karen","Nancy","Donna","Cynthia","Sandra",
+"Pamela","Sharon","Kathleen","Carol","Diane","Brenda","Cheryl","Janet","Elizabeth","Kathy","Margaret","Janice","Carolyn","Denise","Judy",
+"Rebecca","Joyce","Teresa","Christine","Catherine","Shirley","Judith","Betty","Beverly","Lisa","Laura","Theresa","Connie","Ann","Julie",
+"Gloria","Gail","Joan","Paula","Peggy","Cindy","Martha","Bonnie","Jane";
+
+LAST: "Smith","Johnson","Williams","Jones","Brown","Davis","Miller","Wilson","Moore","Taylor","Anderson","Thomas","Jackson","White","Harris",
+"Martin","Thompson","Garcia","Martinez","Robinson","Clark","Rodriguez","Lewis","Lee","Walker","Hall","Allen","Young","Hernandez","King",
+"Wright","Scott","Hill","Green","Adams","Baker","Nelson","Carter","Mitchell","Roberts","Turner","Campbell","Phillips","Evans","Edwards",
+"Collins","Stewart","Howard","Richardson","Cooper","Ward","Price","Bennett","Wood","James","Watson";

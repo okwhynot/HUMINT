@@ -22,6 +22,7 @@ public class HUMINT_World : MonoBehaviour {
 	}
 }
 public class World {
+	public Tile[,,] contents;
 	public Tile[,] z1;
 	public Tile[,] z2;
 	public int w,h;
@@ -35,9 +36,20 @@ public class World {
 		z1 = new Tile[aW*106,aH*36];
 		z2 = new Tile[aW*106,aH*36];
 		ReadMapFromFile(1,1,1);
-		ReadMapFromFile(2,1,1);
-		ReadMapFromFile(1,2,1);
+		//ReadMapFromFile(2,1,1);
+		//ReadMapFromFile(1,2,1);
+		ReadMap("Map Name");
 	}
+	public void ReadMap(string filename) {
+		TextAsset source = Resources.Load("Maps/"+filename) as TextAsset;
+		string[] lines = source.text.Split('\n');
+		foreach(string tile in lines) {
+			string[] contents = tile.Split(';');
+			foreach(string cont in contents) {
+				Debug.Log (cont);
+			}
+		}
+	}	
 	public void ReadMapFromFile(int x, int y, int z) {
 		string filename = x + "," + y + "," + z;
 		TextAsset source = Resources.Load(filename) as TextAsset;
@@ -184,7 +196,7 @@ public struct Tile {
 	public int cost;
 	public Color32 tColor,tCDefault;
 	
-	public Tile(int x, int y, int z,char c, bool canM = true, bool canS = true,Color32 tileC = new Color32()) {
+	public Tile(int x, int y, int z,char c = '.', bool canM = true, bool canS = true,Color32 tileC = new Color32()) {
 		loc = new Vector3(x,y,z);
 		hasBeenSeen = false;
 		tDefault = c;

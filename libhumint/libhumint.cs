@@ -104,18 +104,33 @@ namespace libhumint {
 			foreach(string s in sections) {
 				if(s.TrimStart().StartsWith("MALE_FIRST"))
 				{
-					foreach(string name in s.Substring(11).Split(','))
-						maleFirst.Add(name.TrimStart().Trim('"'));
+					foreach(string name in s.Substring(11).Split(',')) {
+						List<char> accentedName = new List<char>();
+						foreach(char c in name.ToCharArray())
+							accentedName.Add(CharOps.ToASCII(c));
+						string toAdd = new string(accentedName.ToArray());
+						maleFirst.Add(toAdd.TrimStart().Trim('"'));
+					}
 				}
 				else if(s.TrimStart().StartsWith("FEMALE_FIRST"))
 				{
-					foreach(string name in s.Substring(15).Split(','))
-						femaleFirst.Add(name.TrimStart().Trim('"'));
+					foreach(string name in s.Substring(15).Split(',')) {
+						List<char> accentedName = new List<char>();
+						foreach(char c in name.ToCharArray())
+							accentedName.Add(CharOps.ToASCII(c));
+						string toAdd = new string(accentedName.ToArray());
+						femaleFirst.Add(toAdd.TrimStart().Trim('"'));
+					}
 				}
 				else if(s.TrimStart().StartsWith("LAST"))
 				{
-					foreach(string name in s.Substring(6).Split(','))
-						last.Add(name.TrimStart().Trim('"'));
+					foreach(string name in s.Substring(6).Split(',')) {
+						List<char> accentedName = new List<char>();
+						foreach(char c in name.ToCharArray())
+							accentedName.Add(CharOps.ToASCII(c));
+						string toAdd = new string(accentedName.ToArray());
+						last.Add(toAdd.TrimStart(':').TrimStart().Trim('"'));
+					}
 				}
 			}
 		}
@@ -348,7 +363,7 @@ namespace libhumint {
 	class Font : ColorLib {
 		Texture2D atlas;
 		List<Vector2> coordinates = new List<Vector2>();
-		public int fx,fy;
+		public int fx,fy; //fx = character width, fy = character height
 		public Font(string filename) {
 			atlas = Resources.Load("font/"+filename) as Texture2D;
 			fx = atlas.width/16;

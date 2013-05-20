@@ -144,7 +144,8 @@ public class Interface : ColorLib {
 			case State.Inventory: {
 				int childcount = 0;
 				int eqcount = 0;
-				char[] lowercase = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+				char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+				char[] lowercase = alphabet.ToString().ToLower().ToCharArray();
 				string[] slotnames = {"Weapon","Hat","Jacket","Shirt","Gloves","Pants","Boots"};
 				foreach(Transform child in GameObject.FindWithTag("Player").transform) {
 					if(player.equipped.Contains(child.gameObject) == false) //UNEQUIPPED

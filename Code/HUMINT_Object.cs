@@ -82,6 +82,7 @@ public class HUMINT_Object : MonoBehaviour {
 		public enum Spec {Pistols,Explosives,Manipulation,Rifles};
 		public Spec spec;
 		int[] visual;
+		public string alias;
 		public Container playerInventory;
 		public bool wpnHolstered = true;
 		public Player(int[] ccval,int[] vsval) : base() {

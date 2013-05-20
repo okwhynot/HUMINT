@@ -3,8 +3,8 @@ title = HUMAN INTELLIGENCE
 subtitle = HUMINT
 commandant = Karl-Heinz Drews
 # FACTIONS
-staasi = Staatssicherheit
-staasi_s = Staasi
+sis = Secret Intelligence Service
+sis_s = SIS
 cia = Central Intelligence Agency
 cia_s = CIA
 # NEIGHBORHOODS
@@ -30,12 +30,12 @@ september = September
 october = Oktober
 november = November
 december = Dezember
-winter = Winter
 spring = Spring
 summer = Summer
 autumn = Autumn
+winter = Winter
 # MAIN MENU
-ng_button = New Asset
+ng_button = Enlist
 lg_button = Review Dossier
 am_button = Agent Memorial
 aa_button = Agency Archive
@@ -43,11 +43,15 @@ go_button = Settings
 ab_button = About HUMINT
 re_button = Retire
 # CHARACTER CREATOR
-bezirk = Bezirk
-season = Season
-faction = Faction
-specialization = Specialization
-gender = Gender
+bz_title = Bezirk (U)
+sn_title = Season (U)
+fn_title = Faction (U)
+sp_title = Specialization (U)
+pk_title = Perk (U)
+gd_title = Gender
+sc_title = Skin Color (U)
+hc_title = Hair Color (U)
+ec_title = Eye Color (U)
 # WEAPONS
 makarov = Makarov PM
 ppk = Walther PPK
@@ -57,3 +61,14 @@ psm = PSM
 sauer38 = Sauer 38H
 t33 = Tokarev T-33
 aps = Stechkin APS
+# SPECIALIZATIONS
+p_title = Pistols
+r_title = Rifles
+g_title = Equipment
+e_title = Explosives
+m_title = Manipulation
+# PERKS
+cs_title = Crackshot
+cs_desc = Nulla vitae elit libero, a pharetra augue. Donec sed odio dui.
+st_title = Silver Tongue
+st_desc = Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ullamcorper nulla non metus auctor fringilla.
