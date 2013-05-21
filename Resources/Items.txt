@@ -1,90 +1,105 @@
 {
-	name: Survival Knife;
-	id: 23101;
-	damage:;
+	name: Survival Knife
+	description: Military grade survival knife
+	id: 23101
+	damage: 1,3
 }
 {
-	name: Makarov PM;
-	id: 23201;
-	ammo: 9x18mm Makarov;
-	damage:;
-	attach:;
+	name: Makarov PM
+	description: Soviet Union standard automatic pistol during Cold War
+	id: 23201
+	ammo: 9x18mm Makarov
+	damage: 3,6
+	attach:
 }
 {
-	name: Walther PPK;
-	id: 23202;
-	ammo: 7.65x17mm Browning SR (.32 ACP);
-	damage:;
-	attach:;
+	name: Walther PPK
+	description: Semi-automatic pistol built in 1929, used by James Bond
+	id: 23202
+	ammo: 7.65x17mm Browning SR (.32 ACP)
+	damage: 3,4
+	attach:
 }
 {
-	name: Walther P5;
-	id: 23203;
-	ammo: 9x19mm Parabellum;
-	damage:;
-	attach:;
+	name: Walther P5 //design based off P38, basically a shiny newer version
+	description: Semi-automatic pistol developed in the mid-1970s for German police forces
+	id: 23203
+	ammo: 9x19mm Parabellum
+	damage: 4,8
+	attach:
 }
 {
-	name: Walther P38;
-	id: 23204;
-	ammo: 9×19mm Parabellum;
-	damage:;
-	attach:;
+	name: Walther P38
+	description: Semi-automatic pistol developed at the beginning of World War II for the Wehrmacht to replace the Luger P08
+	id: 23204
+	ammo: 9×19mm Parabellum
+	damage: 4,7
+	attach:
 }
 {
-	name: PSM;
-	id: 23205;
-	ammo: 5.45x18mm;
-	damage:;
-	attach:;
+	name: PSM
+	description: "Compact self-loading pistol" designed in 1969 for law enforcement and military officers of the USSR
+	id: 23205
+	ammo: 7.65x17mm Browning SR (.32 ACP)
+	damage: 3,5
+	attach:
 }
 {
-	name: Sauer 38H;
-	id: 23206;
-	ammo:;
-	damage:;
-	attach:;
+	name: Sauer 38H
+	description: Semi-automatic pistol made in Germany in 1938 with an internal hammer
+	id: 23206
+	ammo: 5.45x18mm
+	damage: 2,4
+	attach:
 }
 {
-	name: Tokarev T-33;
-	id: 23207;
-	ammo:;
-	damage:;
-	attach:;
+	name: Tokarev TT-33
+	description: Semi-automatic pistol developed in the early 1930s for Soviet military to replace the M1895
+	id: 23207
+	ammo: 7.62x25mm Tokarev
+	damage: 3,4
+	attach:
 }
 {
-	name: Stechkin APS;
-	id: 23208;
-	ammo:;
-	damage:;
-	attach:;
+	name: Stechkin APS //uses shoulder stock
+	description: Sidearm for the Soviet Army developed in 1951 for artillery soldiers tank crews, and aircraft personnel
+	id: 23208
+	ammo: 9x18mm Makarov
+	damage: 4,6
+	attach:
 }
 {
-	name: 5.45x18mm Mag;
-	id: 25101;
-	capacity: 12;
+	name: 5.45x18mm Mag
+	description: 18mm magazine
+	id: 25101
+	capacity: 12
 }
 {
-	name: Winter jacket;
-	id: 22201;
-	prot:;
-	weight:;
+	name: Winter jacket
+	description: Thick winter jacket
+	id: 22201
+	prot: 2
+	weight: 5kg
 }
 {
-	name: Worker's shirt;
-	id: 22301;
-	prot:;
-	weight:;
+	name: Worker's shirt
+	description: Just and old T shirt
+	id: 22301
+	prot: 1
+	weight: 1kg
 }
 {
-	name: Worker's pants;
-	id: 22401;
-	prot:;
-	weight:;
+	name: Worker's pants
+	description: A classy pair of jeans for the average Joe
+	id: 22401
+	prot: 1
+	weight: 1kg
 }
 {
-	name: Worker's boots;
-	id: 22501;
-	prot:;
-	weight:;
+	name: Worker's boots
+	description: Heavy duty working man's boots
+	id: 22501
+	prot: 1
+	weight: 3kg
 }
+//damagedone=damage(1-(totalprot/100))
