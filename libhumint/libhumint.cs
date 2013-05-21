@@ -76,8 +76,10 @@ namespace libhumint {
 				grid[(y*w) + x].bgcharacter = bgchar;
 			}
 		}
-		public void Recolor(int x, int y, Color32 fg) {
+		public void Recolor(int x, int y, Color32 fg, Color32 bg = new Color32()) {
 			grid[(y*w) + x].foreground = fg;
+			if(bg.r != 0 && bg.g != 0 && bg.g != 0 && bg.a != 0)
+				grid[(y*w) + x].background = bg;
 		}
 		//Trivial operations
 		public Vector2 GetCoords(int num) {

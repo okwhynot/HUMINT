@@ -119,17 +119,17 @@ public class Interface : ColorLib {
 				//Display Area
 				int pX = (int)playerGeneral.Coordinates.x;
 				int pY = (int)playerGeneral.Coordinates.y;
-				int size = worldScript.world.z1.Length;
+				int size = worldScript.world.map.Length;
 				int[] mapXV = {pX-17,pX-16,pX-15,pX-14,pX-13,pX-12,pX-11,pX-10,pX-9,pX-8,pX-7,pX-6,pX-5,pX-4,pX-3,pX-2,pX-1,pX,pX+1,pX+2,pX+3,pX+4,pX+5,pX+6,pX+7,pX+8,pX+9,pX+10,pX+11,pX+12,pX+13,pX+14,pX+15,pX+16,pX+17};
 				int[] mapYV = {pY-6,pY-5,pY-4,pY-3,pY-2,pY-1,pY,pY+1,pY+2,pY+3,pY+4,pY+5,pY+6};
 				for(int x=1;x<=35;x++)
 				{
 					for(int y=1;y<=13;y++)
 					{
-						if(mapXV[x-1] < 0 || mapYV[y-1] < 0 || worldScript.world.z1[mapXV[x-1],mapYV[y-1]].tChar == ' ')
+						if(mapXV[x-1] < 0 || mapYV[y-1] < 0 || worldScript.world.map[mapXV[x-1],mapYV[y-1],0].tChar == ' ')
 							continue;
 						else
-							Rf.Put(x,y,worldScript.world.z1[mapXV[x-1],mapYV[y-1]].tChar,worldScript.world.z1[mapXV[x-1],mapYV[y-1]].tColor);
+							Rf.Put(x,y,worldScript.world.map[mapXV[x-1],mapYV[y-1],0].tChar,worldScript.world.map[mapXV[x-1],mapYV[y-1],0].tColor);
 					}
 				}
 				Rf.Put(18,7,"@");
@@ -192,7 +192,7 @@ public class Interface : ColorLib {
 					//	lrBlockers.Add(p);
 					//	fBL = true;
 					//}
-					worldScript.world.z1[p.x,p.y].tColor = Blue("natural");
+					worldScript.world.map[p.x,p.y,0].tColor = Blue("natural");
 					lrLOS.Add(p);
 				}
 			}
@@ -202,7 +202,7 @@ public class Interface : ColorLib {
 					//	lrBlockers.Add(p);
 					//	fBL2 = true;
 					//}
-					worldScript.world.z1[p.x,p.y].tColor = Green("natural");
+					worldScript.world.map[p.x,p.y,0].tColor = Green("natural");
 					lrLOS.Add(p);
 				}
 			}
@@ -216,15 +216,15 @@ public class Interface : ColorLib {
 			foreach(Line.Point p in L.getPoints()) {
 				if(p.x >= 0 && p.y >= 0) {
 					if(p.x != pX-1 && p.x != pX+1 || p.y != pY) {
-						if(worldScript.world.z1[p.x,p.y].tColor == Blue("natural") || worldScript.world.z1[p.x,p.y].tColor == Green("natural")) {
-							worldScript.world.z1[p.x,p.y].tChar = '!';	
+						if(worldScript.world.map[p.x,p.y,0].tColor == Blue("natural") || worldScript.world.map[p.x,p.y,0].tColor == Green("natural")) {
+							worldScript.world.map[p.x,p.y,0].tChar = '!';	
 						}
 						else {
 							//if(fBL == false && worldScript.world.z1[p.x,p.y].canSeeThrough == false) {
 							//	udBlockers.Add(p);
 							//	fBL = true;
 							//}
-							worldScript.world.z1[p.x,p.y].tColor = Red("natural");
+							worldScript.world.map[p.x,p.y,0].tColor = Red("natural");
 							udLOS.Add(p);
 						}
 					}
@@ -233,15 +233,15 @@ public class Interface : ColorLib {
 			foreach(Line.Point p in L2.getPoints()) {
 				if(p.x >= 0 && p.y >= 0) {
 					if(p.x != pX-1 && p.x != pX+1 || p.y != pY) {
-						if(worldScript.world.z1[p.x,p.y].tColor == Blue("natural") || worldScript.world.z1[p.x,p.y].tColor == Green("natural")) {
-							worldScript.world.z1[p.x,p.y].tChar = (char)173;
+						if(worldScript.world.map[p.x,p.y,0].tColor == Blue("natural") || worldScript.world.map[p.x,p.y,0].tColor == Green("natural")) {
+							worldScript.world.map[p.x,p.y,0].tChar = (char)173;
 						}
 						else {
 							//if(fBL2 == false && worldScript.world.z1[p.x,p.y].canSeeThrough == false) {
 							//	udBlockers.Add(p);
 							//	fBL2 = true;
 							//}
-							worldScript.world.z1[p.x,p.y].tColor = Yellow("natural");
+							worldScript.world.map[p.x,p.y,0].tColor = Yellow("natural");
 							udLOS.Add(p);
 						}
 					}
@@ -249,10 +249,10 @@ public class Interface : ColorLib {
 			}
 		}
 		foreach(Line.Point p in udBlockers) {
-			worldScript.world.z1[p.x,p.y].tColor = worldScript.world.z1[p.x,p.y].tCDefault;
+			worldScript.world.map[p.x,p.y,0].tColor = worldScript.world.map[p.x,p.y,0].tCDefault;
 		}
 		foreach(Line.Point p in lrBlockers) {
-			worldScript.world.z1[p.x,p.y].tColor = worldScript.world.z1[p.x,p.y].tCDefault;
+			worldScript.world.map[p.x,p.y,0].tColor = worldScript.world.map[p.x,p.y,0].tCDefault;
 		}
 		//Restore color - up and down
 		foreach(Line.Point p in udLOS) {
@@ -271,29 +271,29 @@ public class Interface : ColorLib {
 		foreach(Line.Point p in left.getPoints()) {
 			if(p.x >= 0 && p.y >= 0 && block[0] == 0)
 			{
-				worldScript.world.z1[p.x,p.y].tColor = Red("natural");
-				if(worldScript.world.z1[p.x,p.y].canSeeThrough == false)
+				worldScript.world.map[p.x,p.y,0].tColor = Red("natural");
+				if(worldScript.world.map[p.x,p.y,0].canSeeThrough == false)
 					block[0] = left.getPoints().IndexOf(p);
 			}
 		}
 		foreach(Line.Point p in right.getPoints()) {
 			if(p.x >= 0 && p.y >= 0 && block[1] == 0) {
-				worldScript.world.z1[p.x,p.y].tColor = Red("natural");
-				if(worldScript.world.z1[p.x,p.y].canSeeThrough == false)
+				worldScript.world.map[p.x,p.y,0].tColor = Red("natural");
+				if(worldScript.world.map[p.x,p.y,0].canSeeThrough == false)
 					block[1] = right.getPoints().IndexOf(p);
 			}
 		}
 		foreach(Line.Point p in up.getPoints()) {
 			if(p.x >= 0 && p.y >= 0 && block[2] == 0) {
-				worldScript.world.z1[p.x,p.y].tColor = Red("natural");
-				if(worldScript.world.z1[p.x,p.y].canSeeThrough == false)
+				worldScript.world.map[p.x,p.y,0].tColor = Red("natural");
+				if(worldScript.world.map[p.x,p.y,0].canSeeThrough == false)
 					block[2] = up.getPoints().IndexOf(p);
 			}
 		}
 		foreach(Line.Point p in down.getPoints()) {
 			if(p.x >= 0 && p.y >= 0 && block[3] == 0) {
-				worldScript.world.z1[p.x,p.y].tColor = Red("natural");
-				if(worldScript.world.z1[p.x,p.y].canSeeThrough == false)
+				worldScript.world.map[p.x,p.y,0].tColor = Red("natural");
+				if(worldScript.world.map[p.x,p.y,0].canSeeThrough == false)
 					block[3] = down.getPoints().IndexOf(p);
 			}
 		}

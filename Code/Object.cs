@@ -34,7 +34,7 @@ public class Object : MonoBehaviour {
 		public enum FACTION {SIS,CIA,Staasi,KGB,Civ};
 		public SEX sex;
 		public FACTION faction;
-		public int health;
+		public int health = 100;
 	}
 	
 	[System.Serializable]

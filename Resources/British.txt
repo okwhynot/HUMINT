@@ -1,17 +1,5 @@
-MALE_FIRST: "Nigel","Abo","Achim","Adalbald","Adalbold","Adalbert","Adelbert","Alberich","Elberich","Albert","Albrecht","Albrun","Amalbert",
-"Amalfried","Ambros","Andreas","Adrian","Alexander","Agilbert","Amadeus","Anselm","Anshelm","Archibald","Armin","Arndt","Axel","Bertold",
-"Björn","Arnulf","Artur","Bernhard","Bert","Bruno","Karl","Christian","Cristof","Klemens","Konrad","Dierk","Emmerich","Erich","Ernst",
-"Ferdinand","Florian","Friedrich","Gabriel","Georg","Gerald","Gerhart","Gerolf","Gerwig","Hans";
+MALE_FIRST: "Harry","Jack","Oliver","Charlie","James","George","Thomas","Ethan","Jacob","William","Daniel","Joshua","Max","Noah","Alfie","Samuel","Dylan","Oscar","Lucas","Aidan","Isaac","Riley","Henry","Benjamin","Joseph","Alexander","Lewis","Leo","Tyler","Jayden","Zac","Freddie","Archie","Logan","Adam","Ryan","Nathan","Matthew","Sebastian","Jake","Toby","Alex","Luke","Liam","Harrison","David","Jamie","Edward","Luca","Elliot","Aaron","Finley";
 
-FEMALE_FIRST: "Ada","Adda","Adalberta","Alberta","Amalberta","Amalfrieda","Amalie","Amalia","Andrea","Adriane","Alexandra","Alessandra",
-"Alheide","Angela","Angelika","Anita","Anna","Anne","Agathe","Agatha","Antoinette","Arabella","Asta","Astrid","Augusta","Beate","Barbara",
-"Beatrice","Berta","Brigitte","Charlotte","Christiane","Danielle","Effi","Emma","Erika","Erma","Frauke","Geli","Geralde","Gerda","Gertraude",
-"Gertrude","Hadelinde";
+FEMALE_FIRST: "Amelia","Lily","Emily","Sophia","Isabelle","Sophie","Olivia","Jessica","Chloe","Mia","Isla","Isabella","Ava","Charlotte","Grace","Evie","Poppy","Lucy","Ella","Holly","Emma","Molly","Annabelle","Erin","Freya","Ruby","Scarlett","Alice","Layla","Hannah","Eva","Imogen","Millie","Daisy","Abigail","Amy","Zoe","Megan","Maisie","Phoebe","Maya","Anna","Eliza","Caitlin";
 
-LAST: "Müller","Schmidt","Schneider","Fischer","Weber","Schäfer","Meyer","Wagner","Becker","Bauer","Hoffmann","Schulz","Koch","Richter",
-"Klein","Wolf","Schröder","Neumann","Braun","Werner","Schwarz","Hofmann","Zimmermann","Hartmann","Schmid","Schmitz","Krüger","Lange",
-"Maier","Beck","König","Krause","Schulze","Huber","Mayer","Lehmann","Kaiser","Fuchs","Herrmann","Lang","Thomas","Peters","Stein","Jung",
-"Möller","Martin","Friedrich","Scholz","Keller","Hahn","Roth","Günther","Vogel","Schubert","Winkler","Schuster","Jäger","Lorenz",
-"Ludwig","Baumann","Heinrich","Otto","Simon","Graf","Kraus","Krämer","Böhm","Schulte","Albrecht","Franke","Winter","Schumacher","Vogt",
-"Haas","Sommer","Schreiber","Engel","Ziegler","Dietrich","Brandt","Seidel","Kuhn","Busch","Horn","Arnold","Kühn","Bergmann","Pohl",
-"Pfeiffer","Wolff","Voigt","Sauer";
+LAST: "Smith","Johnson","Williams","Jones","Brown","Davis","Miller","Wilson","Moore","Taylor","Anderson","Thomas","Jackson","White","Harris","Martin","Thompson","Garcia","Martinez","Robinson","Clark","Rodriguez","Lewis","Lee","Walker","Hall","Allen","Young","Hernandez","King","Wright","Lopez","Hill","Scott","Green","Adams","Baker","Gonzalez","Nelson","Carter","Mitchell","Perez","Roberts","Turner","Phillips","Campbell","Parker","Evans","Edwards","Collins","Stewart","Sanchez","Morris","Rogers","Reed","Cook","Morgan","Bell","Murphy","Bailey","Rivera","Cooper","Richardson","Cox","Howard","Ward","Torres","Peterson","Gray","Ramirez","James","Watson","Brooks","Kelly","Sanders","Price","Bennett","Wood","Barnes","Ross","Henderson","Coleman","Jenkins","Perry","Powell","Long","Patterson","Hughes","Flores","Washington","Butler","Simmons";

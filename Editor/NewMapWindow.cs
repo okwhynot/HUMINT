@@ -4,7 +4,7 @@ using System.IO;
 
 public class NewMapWindow : EditorWindow {
 	
-	int _x,_y,_z;
+	int _x = 75,_y = 25,_z = 1;
 	Color32 defCol;
 	string mapName = "Map Name";
 	string defChar = ".";
