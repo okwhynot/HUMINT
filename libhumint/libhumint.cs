@@ -681,6 +681,8 @@ namespace libhumint {
 				c = (char)249;
 			else if(n == 8729)
 				c = (char)250;
+			else if(n == 9829)
+				c = (char)3;
 			//251 AND ON ARE LEFT FINAL STRETCH!
 			return c;
 		}
@@ -698,6 +700,6 @@ namespace libhumint.RNG {
 }
 namespace libhumint.AI {
 	public class Pathfinder {
-	
+		
 	}
 }

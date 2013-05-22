@@ -61,7 +61,12 @@ public class Object : MonoBehaviour {
 	}
 	[System.Serializable]
 	public class NPC : Entity {
+		public char graphic;
 		public NPC() {
+			
+		}
+		
+		void PathTo(Vector3 source, Vector3 target) {
 			
 		}
 	}
@@ -70,6 +75,7 @@ public class Object : MonoBehaviour {
 		public enum Subtype {WorldObject,Clothing,Weapon,Gadget,Ammo};
 		public Subtype itemType;
 		public bool isHeld,doesStack,canPickUp;
+		public char graphic;
 		public Item() {
 			isHeld = false; //placeholder values
 			doesStack = true; //placeholder values

@@ -72,3 +72,9 @@ cs_title = Crackshot
 cs_desc = Nulla vitae elit libero, a pharetra augue. Donec sed odio dui.
 st_title = Silver Tongue
 st_desc = Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ullamcorper nulla non metus auctor fringilla.
+# PAUSED
+resume = Continue
+save = Save
+settings = Settings
+abandon = Abandon Game
+quit = Save & Quit
