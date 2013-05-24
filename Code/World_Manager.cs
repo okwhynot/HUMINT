@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using libhumint;
 //Rewrite all of this. It kind of blows.
 public class World_Manager : MonoBehaviour {
@@ -11,7 +12,8 @@ public class World_Manager : MonoBehaviour {
 	}
 	
 	void Start() {
-		
+		world.IndexContents();
+		world.UpdateContents();
 	}
 	
 	public Vector2 GetCoords(int num,int w) {
@@ -23,13 +25,66 @@ public class World_Manager : MonoBehaviour {
 }
 public class World {
 	public Tile[,,] map;
-	public List<GameObject> Items = new List<GameObject>();
-	public List<GameObject> Entities = new List<GameObject>();
+	public List<GameObject> Contents = new List<GameObject>();
 	
 	//Map files now have 106x36 maps. This is to reduce bloat.
 	public World(string filename = "Map Name") {
 		ReadMap(filename);
 	}
+	
+	void Populate() {
+		
+	}
+	
+	public void IndexContents() {//Initially indexes all NPCs and items to add to the map.
+		string[] tagsToExclude = {"Generic Item","Manager","MainCamera","Player"};
+		object [] allObjects = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+		foreach(object thisObject in allObjects) {
+			GameObject processed = (GameObject)thisObject;
+			if(processed.activeInHierarchy && tagsToExclude.Contains(processed.tag) == false) {
+				Contents.Add(processed);
+			}
+		}
+	}
+	
+	public void UpdateContents() {
+		List<Vector3> locs = new List<Vector3>();
+		foreach(GameObject obj in Contents) {
+			Object o = obj.GetComponent<Object>();
+			Vector3 location = o.Coordinates;
+			locs.Add(location);
+			int x = (int)location.x;
+			int y = (int)location.y;
+			int z = (int)location.z;
+			map[x,y,z].tileContents.Add(obj);
+		}
+		
+		int w = map.GetLength(0);
+		int l = map.GetLength(1);
+		int h = map.GetLength(2);
+		
+		for(int x = 0; x < w; x++) {//This updates the tile's display depending on whatever is or isn't present.
+			for(int y = 0; y < l; y++) {
+				for(int z = 0; z < h; z++) {
+					foreach(GameObject obj in map[x,y,z].tileContents) {
+						if(obj.tag == "NPC") {
+							map[x,y,z].npcPresent = true;
+							map[x,y,z].tChar = obj.GetComponent<Object>().display[0];
+						}
+					}
+					
+					
+					if(locs.Contains(map[x,y,z].loc) == false) {
+						map[x,y,z].tileContents.Clear();
+						map[x,y,z].npcPresent = false;
+						map[x,y,z].tChar = map[x,y,z].tDefault;
+						//map[x,y,z].tColor = map[x,y,z].tCDefault;
+					}
+				}
+			}
+		}
+	}
+	
 	public void ReadMap(string filename) {
 		TextAsset source = Resources.Load("Maps/"+filename) as TextAsset;
 		string[] lines = source.text.Split('\n');
@@ -181,6 +236,8 @@ public struct Tile {
 	public bool isDoor,isOpen,canMoveTo,canSeeThrough;
 	public int cost;
 	public Color32 tColor,tCDefault;
+	public bool npcPresent;
+	public List<GameObject> tileContents;
 	
 	public Tile(int x, int y, int z,char c = '.', bool canM = true, bool canS = true,Color32 tileC = new Color32()) {
 		loc = new Vector3(x,y,z);
@@ -194,14 +251,21 @@ public struct Tile {
 		canSeeThrough = canS;
 		isDoor = false;
 		isOpen = false;
+		npcPresent = false;
+		tileContents = new List<GameObject>();
 	}
+	
 	public void Open() {
 		tChar = '.';
+		tDefault = tChar;
+		canMoveTo = true;
 		canSeeThrough = true;
 		isOpen = true;
 	}
 	public void Close() {
+		tDefault = (char)219;
 		tChar = tDefault;
+		canMoveTo = false;
 		canSeeThrough = false;
 		isOpen = false;
 	}

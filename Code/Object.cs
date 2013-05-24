@@ -9,6 +9,7 @@ public class Object : MonoBehaviour {
 	public Type objectType;
 	public string name;
 	public int id;
+	public string display;
 	public Player player;
 	public NPC npc;
 	public Item item;
@@ -61,12 +62,7 @@ public class Object : MonoBehaviour {
 	}
 	[System.Serializable]
 	public class NPC : Entity {
-		public char graphic;
 		public NPC() {
-			
-		}
-		
-		void PathTo(Vector3 source, Vector3 target) {
 			
 		}
 	}

@@ -99,7 +99,7 @@ public class ObjectEditor : Editor
 		 serializedObject.Update ();
 		 var obj = serializedObject.GetIterator ();
 		 if (obj.NextVisible (true)) {
-            // Loops through all visiuble fields
+            // Loops through all visible fields
 			 do {
 				 bool shouldBeVisible = true;
 				 // Tests if the field is a field that should be hidden/shown due to the enum value
