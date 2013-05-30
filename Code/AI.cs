@@ -1,10 +1,13 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using libhumint;
+using libhumint.Data;
 
 public class AI : MonoBehaviour {
-	
+	byte[,] size;
 	Game_Manager GameManager;
 	Object thisObject,playerObject;
 	List<Line.Point> path = new List<Line.Point>();
@@ -18,83 +21,108 @@ public class AI : MonoBehaviour {
 		playerObject = GameObject.Find("Player").GetComponent<Object>();
 	}
 	
+	void Start() {
+	
+	}
+	
 	void Update() {
 		
 	}
-	
+		
 	//Horizontal & vertical movement costs 10 points, diag costs 14.
 	//F = G + H
 	//H = the estimated movement cost to move from that given square to the end.
 	//OH, don't forget to add the whole "open" list and stuff. That's super important!
 	public void Pathfind() {
-		path = new List<Line.Point>();
+		path.Clear();
 		ind = 0;
-		Vector3 start = thisObject.Coordinates;
-		Vector3 end = playerObject.Coordinates;
-
-		
-		int startDist = (int)System.Math.Sqrt(System.Math.Pow((end.x - start.x), 2) + System.Math.Pow((end.y - start.y), 2));
-		
-		int x = (int)start.x;
-		int y = (int)start.y;
-		int z = (int)start.z;
-		int ex = (int)end.x;
-		int ey = (int)end.y;
-		int ez = (int)end.z;
-		
-		List<Line.Point> open = new List<Line.Point>();
-		
-		Line.Point endP = new Line.Point(ex,ey,ez);
-		
-		Line.Point[] _movements = {
-			new Line.Point(x-1,y-1,z),
-			new Line.Point(x,y-1,z),
-			new Line.Point(x+1,y-1,z),
-			new Line.Point(x+1,y,z),
-			new Line.Point(x+1,y+1,z),
-			new Line.Point(x,y+1,z),
-			new Line.Point(x-1,y+1,z),
-			new Line.Point(x-1,y,z)
-		};
-		
-		Line.Point next = new Line.Point(x,y,z);
-		
-		repeat:
-		_movements = FindAvailable(next);
-		List<Line.Point> toExamine = new List<Line.Point>();
-		List<Line.Point> invalid = new List<Line.Point>();
-		
-		foreach(Line.Point p in _movements) {//Cut out the invalid points.
-			//GameManager.WorldManager.world.map[p.x,p.y,p.z].tColor = ColorLib.Green("natural"); //**DEBUG**
-			if(invalid.Contains(p))
-				continue;
-			if(ValidCoordinates(p)) {
-				toExamine.Add(p);
+		int curTry = 0;
+		//int maxTries = 100;
+		Vector3 _start = thisObject.Coordinates;
+		Vector3 _end = playerObject.Coordinates;
+		Line.Point start = new Line.Point((int)_start.x,(int)_start.y,(int)_start.z);
+		Line.Point end = new Line.Point((int)_end.x,(int)_end.y,(int)_end.z);
+		int maxTries = 5 * (Math.Abs(start.x - end.x) + Math.Abs (start.y - end.y));
+		//int maxTries = 300;
+		BinaryHeap<Node> open = new BinaryHeap<Node>();
+		//List<Node> open = new List<Node>();
+		List<Node> closed = new List<Node>();
+			
+		Node finish = new Node(end, end);
+		Node origin = new Node(start, end);
+		open.Add(origin);
+		Node current = open.Remove(); //Sets current to the lowest f-cost square in open and removes it.
+		closed.Add(current); //Adds the current tile to closed.
+		#region Loop
+		loopstart:
+			
+		Node[] adjacent = AdjacentNodes(closed[closed.Count-1]); //Ignores closed or unwalkable spaces.
+		open.Clear ();
+		foreach(Node node in adjacent) {
+			bool found = false;
+			foreach(Node n in closed) {
+				if(node._this == n._this) {
+					found = true;
+					break;
+				}
 			}
-			else if(ValidCoordinates(p) == false)
-				invalid.Add(p);
+			if(found == false)
+				open.Add(node);
 		}
-		int[] fcost = new int[toExamine.Count];
-		//Calculate H via manhattan method, using cur point & end point (run + rise * 10)
-		//Can't move to the other side of a walled structure??
-		foreach(Line.Point p in toExamine) {//Determine the lowest costing move.
-			int index = toExamine.IndexOf(p);
-			fcost[index] = DetermineFValue(next.x, next.y, next.z, p.x, p.y, p.z, end);
+		current = open.Peek();
+		if(current._parent.x == end.x && current._parent.y == end.y) {
+			Debug.Log("Successfully found line.");
+			goto done;
 		}
-		next = toExamine[IndexOfCheapest(fcost)];
-		path.Add(next);
-		int dist = (int)System.Math.Sqrt(System.Math.Pow((end.x - next.x), 2) + System.Math.Pow((end.y - next.y), 2));
-		if(startDist >= 0) {
-			startDist--;
-			goto repeat;
-		}
+		closed.Add(open.Remove());
 		
-		if(path[path.Count-1] != endP)
-			Debug.Log("Failed.");
+		curTry++;
+		if(curTry < maxTries)
+			goto loopstart;
+		#endregion
 		
-		foreach(Line.Point p in path)
-			GameManager.WorldManager.world.map[p.x,p.y,p.z].tColor = ColorLib.Red("natural");
-		ind = 0;
+		#region Finalization (Debug coloring)
+		done:
+			
+		Node last = closed[closed.Count - 1];
+		
+		//foreach(Node n in open) {
+		//	GameManager.WorldManager.world.map[n.x,n.y,n.z].tColor = ColorLib.Green("cga");
+		//}
+		
+		restart:
+		
+		
+		
+		
+		foreach(Node n in closed) {
+			GameManager.WorldManager.world.map[n.x,n.y,n.z].tColor = ColorLib.Red("cga");
+		}	
+		GameManager.WorldManager.world.map[last.x,last.y,last.z].tColor = ColorLib.Yellow("cga");
+		#endregion
+	}
+	
+	private Node[] AdjacentNodes(Node parent) {
+		World_Manager w = GameManager.WorldManager;
+		List<Node> adjacent = new List<Node>();
+		for(int x = -1; x <= 1; x++) {
+			for(int y = -1; y <= 1; y++) {
+				if(x == 0 && y == 0)
+					continue;
+				int _x = parent.x + x;
+				int _y = parent.y + y;
+				if(_x < 0 || _y < 0)
+					continue;
+				//Add in z-axis later. maybe. 
+				if(w.world.map[_x,_y,0].canMoveTo == true) {//Ignores invalid nodes.
+					Line.Point cur = new Line.Point(_x,_y,0);
+					Line.Point end = parent._end;
+					Node toAdd = new Node(cur,parent);
+					adjacent.Add(toAdd);
+				}
+			}
+		}
+		return adjacent.ToArray();
 	}
 	
 	public void FollowPath() {
@@ -102,63 +130,9 @@ public class AI : MonoBehaviour {
 			return;
 		thisObject.Coordinates = new Vector3(path[ind].x,path[ind].y,path[ind].z);
 		ind++;
-		
-	}
-	//x0, y0, z0 are the current tile. x1, y1, z1 are the next tile.
-	//Crashes when trying to lower the y value.
-	private int DetermineFValue(int x0, int y0, int z0, int x1, int y1, int z1, Vector3 e) {
-		int G = 0;
-		
-		int ex = (int)e.x;
-		int ey = (int)e.y;
-		int ez = (int)e.z;
-		
-		int ri = x1 - x0;
-		int ru = y1 - y0;
-		
-		int rise = System.Math.Abs(ey - y1);
-		int run = System.Math.Abs(ex - x1);
-		
-		if(ru == 0 || ri/ru == 0) {//CARDINAL DIRECTIONS
-			G = 10;
-		}
-		else {//DIAGONALS
-			G = 14;
-		}
-		
-		//if(GameManager.WorldManager.world.map[x1,y1,z1].canMoveTo == false)
-		//	G = 60;
-				
-		int H = (run + rise) * 10;
-		int F = G + H;
-		return F;
 	}
 	
-	private int IndexOfCheapest(int[] cost) {
-		int[] sorted = new int[cost.Length];
-		System.Array.Copy(cost, sorted, cost.Length);
-		System.Array.Sort(sorted);
-		return System.Array.IndexOf(cost, sorted[0]);
-	}
-	
-	private Line.Point[] FindAvailable(Line.Point point) {
-		int x = point.x;
-		int y = point.y;
-		int z = point.z;
-		 
-		return new Line.Point[] {
-			new Line.Point(x+1,y,z),
-			new Line.Point(x-1,y,z),
-			new Line.Point(x,y+1,z),
-			new Line.Point(x,y-1,z),
-			new Line.Point(x-1,y-1,z),
-			new Line.Point(x+1,y-1,z),
-			new Line.Point(x+1,y+1,z),
-			new Line.Point(x-1,y+1,z)
-		};
-	}
-	
-	private bool ValidCoordinates(Line.Point point) {
+	private bool ValidCoordinates(Node point) {
 		int x = point.x;
 		int y = point.y;
 		int z = point.z;
@@ -177,10 +151,75 @@ public class AI : MonoBehaviour {
 			return false;
 		if(GameManager.WorldManager.world.map[x,y,z].canMoveTo == false)
 			return false;
-		if(path.Contains(point))
+		if(path.Contains(point._this))
 			return false;
 		if(GameManager.WorldManager.world.map[x,y,z].isDoor && GameManager.WorldManager.world.map[x,y,z].isOpen == false)
 			return false;
 		return true;
+	}
+	
+	class Node : IComparable<Node> {
+		public Line.Point _this;
+		public int x,y,z;
+		public Line.Point _parent;
+		public Line.Point _end;
+		public int h,g,f;
+		public Node parent;
+		
+		//Only used to initialize the parent.
+		public Node(Line.Point cur, Line.Point end) {
+			_this = cur;
+			x = cur.x;
+			y = cur.y;
+			z = cur.z;
+			_end = end;
+			g = 0;
+			h = heuristic();
+			//h *= (int)(1.0 + (1/1000));
+			f = h + g;
+			parent = this;
+		}
+		
+		public Node(Line.Point cur, Node parent) {
+			_this = cur;
+			this.parent = parent;
+			_parent = parent._this;
+			_end = parent._end;
+			x = cur.x;
+			y = cur.y;
+			z = cur.z;
+			
+			h = heuristic();
+			g = parent.g + gValue();
+			f = h + g;
+		}
+		
+		public int CompareTo(Node other) {
+			return f - other.f;
+		}
+		public override string ToString () {
+			 return "Node @ ("+x+","+y+"):" + f.ToString();
+		}
+		int gValue() {
+			int rise = Math.Abs(_parent.y - y);
+			int run = Math.Abs(_parent.x - x);
+			
+			if(rise == run) {
+				return 14;
+			}
+			return 10;
+		}
+		//Honestly you could -probably- just use the manhattan method. It'd give decent-ish lines.
+		int heuristic() {
+			int H = 0;
+			int xDistance = Math.Abs(x - _end.x);
+			int yDistance = Math.Abs(y - _end.y);
+			
+			if(xDistance > yDistance)
+				H = 14*yDistance + 10*(xDistance-yDistance);
+			else
+				H = 14*xDistance + 10*(yDistance-xDistance);
+			return H;
+		}
 	}
 }

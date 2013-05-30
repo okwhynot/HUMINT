@@ -9,11 +9,12 @@ public class World_Manager : MonoBehaviour {
 
 	void Awake() {
 		world = new World();
+		world.IndexContents();
+		world.UpdateContents();
 	}
 	
 	void Start() {
-		world.IndexContents();
-		world.UpdateContents();
+		
 	}
 	
 	public Vector2 GetCoords(int num,int w) {
@@ -25,6 +26,7 @@ public class World_Manager : MonoBehaviour {
 }
 public class World {
 	public Tile[,,] map;
+	public byte[,] costs;
 	public List<GameObject> Contents = new List<GameObject>();
 	
 	//Map files now have 106x36 maps. This is to reduce bloat.
@@ -62,6 +64,7 @@ public class World {
 		int w = map.GetLength(0);
 		int l = map.GetLength(1);
 		int h = map.GetLength(2);
+		costs = new byte[w,l];
 		
 		for(int x = 0; x < w; x++) {//This updates the tile's display depending on whatever is or isn't present.
 			for(int y = 0; y < l; y++) {

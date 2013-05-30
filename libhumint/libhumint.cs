@@ -1,8 +1,11 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using libhumint.RNG;
+using libhumint.Data;
+
+#region libhumint
 namespace libhumint {
 	public class Console : ColorLib {
 		//w and h are grid dimensions.
@@ -143,10 +146,10 @@ namespace libhumint {
 			int fnlen = femaleFirst.Count;
 			int lnlen = last.Count;
 			if(gender == 0)
-				first = maleFirst[Random.Range(0,mnlen)];
+				first = maleFirst[UnityEngine.Random.Range(0,mnlen)];
 			else
-				first = femaleFirst[Random.Range(0,fnlen)];
-			string lastn = last[Random.Range(0,lnlen)];
+				first = femaleFirst[UnityEngine.Random.Range(0,fnlen)];
+			string lastn = last[UnityEngine.Random.Range(0,lnlen)];
 			string n = first + " " + lastn;
 			if(usedNames.Contains(n))
 				n = Name(gender);
@@ -691,6 +694,8 @@ namespace libhumint {
 		}
 	}
 }
+#endregion
+#region libhumint.RNG
 namespace libhumint.RNG {
 	public class RNG {
 		public RNG(int seed) {
@@ -698,8 +703,158 @@ namespace libhumint.RNG {
 		}
 	}
 }
-namespace libhumint.AI {
-	public class Pathfinder {
+#endregion
+#region libhumint.Data
+namespace libhumint.Data {
+	//The children of any given item are always stored at the item’s location * 2 and the item’s location * 2 + 1.
+	public class BinaryHeap<T> : ICollection<T> where T : IComparable<T> {
+		#region Constants
+		private const int DEFAULT_SIZE = 4;
+		#endregion
+		#region Fields
+		private T[] _data = new T[DEFAULT_SIZE];
+		private int _count = 0;
+		private int _capacity = DEFAULT_SIZE;
+		private bool _sorted;
+		#endregion
+		#region Properties
+		public int Count { get { return _count; } }
+		public int Capacity { 
+			get { return _capacity; }
+			set { 
+				int previousCapacity = _capacity;
+				_capacity = Math.Max(value, _count);
+				if(_capacity != previousCapacity) {
+					T[] temp = new T[_capacity];
+					Array.Copy(_data, temp, _count);
+					_data = temp;
+				}
+			}
+		}
+		#endregion
+		#region Methods
+		public BinaryHeap() { } //Create a new heap
+		private BinaryHeap(T[] data, int count) {
+			Capacity = count;
+			_count = count;
+			Array.Copy(data, _data, count);
+		} //Create a new heap
+		public T Peek() {
+			return _data[0];
+		} //Get the lowest value in the heap without removing it.
+		public void Clear() {
+			this._count = 0;
+			_data = new T[_capacity];
+		} //Removes all items from heap.
+		public void Add(T item) {
+			if(_count == _capacity) {
+				Capacity *= 2;
+			}
+			_data[_count] = item;
+			UpHeap();
+			_count++;
+		} //Adds a key & value to the heap.
+		public T Remove() {
+			if(this._count == 0) {
+				throw new InvalidOperationException("Heap is empty, yo. Can't remove.");
+			}
+			T v = _data[0];
+			_count--;
+			_data[0] = _data[_count];
+			_data[_count] = default(T); //Clears the last node.
+			DownHeap();
+			return v;
+		} //Removes & returns the first item in the heap.
+		private void UpHeap() {
+			_sorted = false;
+			int p = _count;
+			T item = _data[p];
+			int par = Parent(p);
+			while(par > -1 && item.CompareTo(_data[par]) < 0) {
+                _data[p] = _data[par]; //Swap nodes
+                p = par;
+                par = Parent(p);
+			}
+			_data[p] = item;
+		} //Helper function that performs up-heap bubbling.
+		private void DownHeap() {
+            _sorted = false;
+            int n;
+            int p = 0;
+            T item = _data[p];
+            while (true) {
+                int ch1 = Child1(p);
+                if (ch1 >= _count) break;
+                int ch2 = Child2(p);
+                if (ch2 >= _count) {
+                    n = ch1;
+                }
+                else {
+                    n = _data[ch1].CompareTo(_data[ch2]) < 0 ? ch1 : ch2;
+                }
+                if (item.CompareTo(_data[n]) > 0) {
+                    _data[p] = _data[n]; //Swap nodes
+                    p = n;
+                }
+                else {
+                    break;
+                }
+            }
+            _data[p] = item;
+        } //Helper function that performs down-heap bubbling
+		private void EnsureSort() {
+            if (_sorted) return;
+            Array.Sort(_data, 0, _count);
+            _sorted = true;
+        }
+        private static int Parent(int index) {
+            return (index - 1) >> 1;
+        } //helper function that calculates the parent of a node
+        private static int Child1(int index) {
+            return (index << 1) + 1;
+        } //helper function that calculates the first child of a node
+        private static int Child2(int index) {
+            return (index << 1) + 2;
+        } //helper function that calculates the second child of a node
 		
+		public BinaryHeap<T> Copy() {
+            return new BinaryHeap<T>(_data, _count);
+        }
+        public IEnumerator<T> GetEnumerator() {
+            EnsureSort();
+            for (int i = 0; i < _count; i++)
+            {
+                yield return _data[i];
+            }
+        } // Gets an enumerator for the binary heap.
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
+
+        public bool Contains(T item) {
+            EnsureSort();
+            return Array.BinarySearch<T>(_data, 0, _count, item) >= 0;
+        } // Checks to see if the binary heap contains the specified item.
+        
+        public void CopyTo(T[] array, int arrayIndex) {
+            EnsureSort();
+            Array.Copy(_data, array, _count);
+        } // Copies the binary heap to an array at the specified index.
+        
+        public bool IsReadOnly {
+            get { return false; }
+        } // Gets whether or not the binary heap is readonly.
+       	
+        public bool Remove(T item) {
+            EnsureSort();
+            int i = Array.BinarySearch<T>(_data, 0, _count, item);
+            if (i < 0) return false;
+            Array.Copy(_data, i + 1, _data, i, _count - i);
+            _data[_count] = default(T);
+            _count--;
+            return true;
+        } // Removes an item from the binary heap. This utilizes the type T's Comparer and will not remove duplicates.
+		#endregion
 	}
 }
+#endregion

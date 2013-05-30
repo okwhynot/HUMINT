@@ -34,8 +34,10 @@ public class Game_Manager : MonoBehaviour {
 		Control();
 		if(Input.GetKeyDown("4"))
 			Tick();
-		if(Input.GetKeyDown("="))
+		if(Input.GetKeyDown("=")) {
 			GameObject.FindWithTag("NPC").GetComponent<AI>().Pathfind();
+			Tick();
+		}
 	}
 	
 	void Tick() {
