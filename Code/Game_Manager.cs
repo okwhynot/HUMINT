@@ -14,7 +14,6 @@ public class Game_Manager : MonoBehaviour {
 	public GameObject Player;
 	
 	void Awake() {
-		
 		foreach(GameObject npc in GameObject.FindGameObjectsWithTag("NPC")) {
 			DontDestroyOnLoad(npc);
 		}

@@ -7,13 +7,11 @@ using libhumint;
 using libhumint.Data;
 
 public class AI : MonoBehaviour {
-	byte[,] size;
 	Game_Manager GameManager;
 	Object thisObject,playerObject;
 	List<Line.Point> path = new List<Line.Point>();
 	
 	int ind = 0;
-	
 	
 	void Awake() {
 		GameManager = GameObject.FindWithTag("Manager").GetComponent<Game_Manager>();
@@ -42,63 +40,100 @@ public class AI : MonoBehaviour {
 		Vector3 _end = playerObject.Coordinates;
 		Line.Point start = new Line.Point((int)_start.x,(int)_start.y,(int)_start.z);
 		Line.Point end = new Line.Point((int)_end.x,(int)_end.y,(int)_end.z);
-		int maxTries = 5 * (Math.Abs(start.x - end.x) + Math.Abs (start.y - end.y));
+		int maxTries = 10 * (Math.Abs(start.x - end.x) + Math.Abs (start.y - end.y));
 		//int maxTries = 300;
 		BinaryHeap<Node> open = new BinaryHeap<Node>();
 		//List<Node> open = new List<Node>();
 		List<Node> closed = new List<Node>();
-			
-		Node finish = new Node(end, end);
+		
+		//Line toPlayer = new Line(start.x, start.y, end.x, end.y);
+		
+		Node finish = new Node(end, start);
 		Node origin = new Node(start, end);
+		
+		
 		open.Add(origin);
 		Node current = open.Remove(); //Sets current to the lowest f-cost square in open and removes it.
 		closed.Add(current); //Adds the current tile to closed.
 		#region Loop
 		loopstart:
-			
-		Node[] adjacent = AdjacentNodes(closed[closed.Count-1]); //Ignores closed or unwalkable spaces.
-		open.Clear ();
+		
+		Node n = closed[closed.Count - 1];
+		Node[] adjacent = AdjacentNodes(n); //Ignores closed or unwalkable spaces.
+		open.Clear();
+		List<Node> _temp = new List<Node>();
+		List<Node> _open = open.ToList();
 		foreach(Node node in adjacent) {
-			bool found = false;
-			foreach(Node n in closed) {
-				if(node._this == n._this) {
-					found = true;
-					break;
-				}
+			int newg = n.g + node.gValue();
+			int indexC = closed.FindIndex(f => f._this == node._this);
+			int indexO = _open.FindIndex(f => f._this == node._this);
+			int newf = newg + node.h;
+			if(indexC != -1 && closed[indexC].g <= newg || indexO != -1 && _open[indexO].g <= newg) {
+				break;
 			}
-			if(found == false)
-				open.Add(node);
+			Node n1 = new Node(node._this,end);
+			n1.parent = n;
+			n1._parent = n._this;
+			n1._end = n1.parent._end;
+			n1.g = newg;
+			n1.h = n1.heuristic();
+			n1.f = n1.g + n1.h;
+			
+			if(indexC != -1) {
+				closed.RemoveAt(indexC);
+				Debug.Log ("Success");
+			}
+			
+			if(indexO == -1) {
+				open.Add(n1);
+			}
 		}
+		
 		current = open.Peek();
-		if(current._parent.x == end.x && current._parent.y == end.y) {
-			Debug.Log("Successfully found line.");
+		if(current.x == end.x && current.y == end.y) {
+			Debug.Log("Successfully found path.");
+			Debug.Log (closed.Count);
 			goto done;
 		}
+		_temp.Add(open.Peek());
 		closed.Add(open.Remove());
 		
 		curTry++;
-		if(curTry < maxTries)
+		if(curTry < maxTries && open.Count > 0) {
+			
 			goto loopstart;
+		}
+		else if(curTry == maxTries && open.Count > 0) {
+			
+		}
+		else if(curTry >= maxTries) {
+			Debug.Log ("Failed to find line.");
+			Debug.Log (closed.Count + " items in the closed list.");
+			
+		}
 		#endregion
 		
 		#region Finalization (Debug coloring)
 		done:
-			
+		closed.RemoveAt(0);
 		Node last = closed[closed.Count - 1];
 		
-		//foreach(Node n in open) {
-		//	GameManager.WorldManager.world.map[n.x,n.y,n.z].tColor = ColorLib.Green("cga");
+		//foreach(Line.Point p in toPlayer.getPoints()) {
+			//GameManager.WorldManager.world.map[p.x,p.y,p.z].tColor = ColorLib.LightGreen("cga");
+			//GameManager.WorldManager.world.map[p.x,p.y,p.z].tDefault = '-';
 		//}
 		
-		restart:
+		foreach(Node no in open) {
+			//GameManager.WorldManager.world.map[no.x,no.y,no.z].tColor = ColorLib.Green("cga");
+			//GameManager.WorldManager.world.map[no.x,no.y,no.z].tDefault = 'O';
+		}
 		
-		
-		
-		
-		foreach(Node n in closed) {
-			GameManager.WorldManager.world.map[n.x,n.y,n.z].tColor = ColorLib.Red("cga");
-		}	
+		foreach(Node no in closed) {
+			GameManager.WorldManager.world.map[no.x,no.y,no.z].tColor = ColorLib.Red("cga");
+			GameManager.WorldManager.world.map[no.x,no.y,no.z].tDefault = 'P';
+		}
 		GameManager.WorldManager.world.map[last.x,last.y,last.z].tColor = ColorLib.Yellow("cga");
+		GameManager.WorldManager.world.map[last.x,last.y,last.z].tDefault = 'E';
 		#endregion
 	}
 	
@@ -111,13 +146,16 @@ public class AI : MonoBehaviour {
 					continue;
 				int _x = parent.x + x;
 				int _y = parent.y + y;
-				if(_x < 0 || _y < 0)
+				if(_x < 0 || _y < 0 || _x > w.world.map.GetUpperBound(0) || _y > w.world.map.GetUpperBound(1))
 					continue;
+				
 				//Add in z-axis later. maybe. 
 				if(w.world.map[_x,_y,0].canMoveTo == true) {//Ignores invalid nodes.
 					Line.Point cur = new Line.Point(_x,_y,0);
 					Line.Point end = parent._end;
-					Node toAdd = new Node(cur,parent);
+					Node toAdd = new Node(cur);
+					toAdd.parent = parent;
+					toAdd._parent = parent._this;
 					adjacent.Add(toAdd);
 				}
 			}
@@ -164,9 +202,10 @@ public class AI : MonoBehaviour {
 		public Line.Point _parent;
 		public Line.Point _end;
 		public int h,g,f;
+		int _g;
 		public Node parent;
 		
-		//Only used to initialize the parent.
+		//Only used to initialize the starting node.
 		public Node(Line.Point cur, Line.Point end) {
 			_this = cur;
 			x = cur.x;
@@ -174,24 +213,18 @@ public class AI : MonoBehaviour {
 			z = cur.z;
 			_end = end;
 			g = 0;
+			parent = this;
 			h = heuristic();
 			//h *= (int)(1.0 + (1/1000));
 			f = h + g;
-			parent = this;
+			parent = null;
 		}
 		
-		public Node(Line.Point cur, Node parent) {
+		public Node(Line.Point cur) {
 			_this = cur;
-			this.parent = parent;
-			_parent = parent._this;
-			_end = parent._end;
 			x = cur.x;
 			y = cur.y;
 			z = cur.z;
-			
-			h = heuristic();
-			g = parent.g + gValue();
-			f = h + g;
 		}
 		
 		public int CompareTo(Node other) {
@@ -200,7 +233,7 @@ public class AI : MonoBehaviour {
 		public override string ToString () {
 			 return "Node @ ("+x+","+y+"):" + f.ToString();
 		}
-		int gValue() {
+		public int gValue() {
 			int rise = Math.Abs(_parent.y - y);
 			int run = Math.Abs(_parent.x - x);
 			
@@ -210,16 +243,25 @@ public class AI : MonoBehaviour {
 			return 10;
 		}
 		//Honestly you could -probably- just use the manhattan method. It'd give decent-ish lines.
-		int heuristic() {
-			int H = 0;
+		public int heuristic() {
 			int xDistance = Math.Abs(x - _end.x);
 			int yDistance = Math.Abs(y - _end.y);
 			
+			//return (g - parent.g) * Math.Max(xDistance, yDistance);
+			
+			int _g1 = 0;
+			int _g0 = g - parent.g;
+			if(_g0 == 10)
+				_g1 = 14;
+			else if(_g0 == 14)
+				_g1 = 10;
+			
+			//return _g0 * (xDistance + yDistance) + (_g1 - 2 * _g0) * Math.Min(xDistance, yDistance);
+			
 			if(xDistance > yDistance)
-				H = 14*yDistance + 10*(xDistance-yDistance);
+				return 14*yDistance + 10*(xDistance-yDistance);
 			else
-				H = 14*xDistance + 10*(yDistance-xDistance);
-			return H;
+				return 14*xDistance + 10*(yDistance-xDistance);
 		}
 	}
 }

@@ -2,8 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using libhumint.Data;
 
 #region libhumint
 namespace libhumint {
@@ -35,17 +33,37 @@ namespace libhumint {
 				bgcharacter = BGChar;
 			}
 		}
+		/// <summary>
+		/// Render this console.
+		/// </summary>
 		public void Render() {
 			foreach(GridSlot g in grid)
 				if(g.character != 0)
 					font.Draw((int)g.location.x,(int)g.location.y,g.foreground,g.background,(char)g.character,(char)g.bgcharacter);
 		}
+		/// <summary>
+		/// Flush this console of all contents.
+		/// </summary>
 		public void Flush() {
 			for(int num = 0; num < w*h; num++)
 				grid[num] = new GridSlot(font.fx,font.fy,GetCoords(num));
 		}
-		//x and y are grid
-		public void Put(int x, int y, object obj,Color32 fg = new Color32(),Color32 bg = new Color32(),char bgchar = (char)219) {
+		/// <summary>
+		/// Put the specified character or string at the specified (x,y) coordinate.
+		/// </summary>
+		/// <param name='obj'>
+		/// Contents. Must be either an integer, a string, or a character.
+		/// </param>
+		/// <param name='fg'>
+		/// Foreground.
+		/// </param>
+		/// <param name='bg'>
+		/// Background.
+		/// </param>
+		/// <param name='bgchar'>
+		/// Background character.
+		/// </param>
+		public void Put(int x, int y, object obj, Color32 fg = new Color32(), Color32 bg = new Color32(), char bgchar = (char)219) {
 			string type = obj.GetType().ToString();
 			if(fg.r == 0 && fg.g == 0 && fg.b == 0 && fg.a == 0)
 				fg = White();
@@ -79,6 +97,15 @@ namespace libhumint {
 				grid[(y*w) + x].bgcharacter = bgchar;
 			}
 		}
+		/// <summary>
+		/// Recolor the specified coordinate.
+		/// </summary>
+		/// <param name='fg'>
+		/// Foreground.
+		/// </param>
+		/// <param name='bg'>
+		/// Background.
+		/// </param>
 		public void Recolor(int x, int y, Color32 fg, Color32 bg = new Color32()) {
 			grid[(y*w) + x].foreground = fg;
 			if(bg.r != 0 && bg.g != 0 && bg.g != 0 && bg.a != 0)
@@ -96,7 +123,6 @@ namespace libhumint {
 			return num;
 		}
 	}
-	//Rewriting name generator to use TextAssets
 	public class NameGenerator {
 		public TextAsset source;
 		List<string> maleFirst = new List<string>();
@@ -161,50 +187,40 @@ namespace libhumint {
 	public class ColorLib {
 		//Blank for default, natural, colorblind, cga, alternate
 		public static Color Black() {
-			Color32 b = new Color32(0,0,0,255);
-			return b;
+			return new Color32(0,0,0,255);
 		}
 		public static Color Blue(string s = "default") {
-			Color32 b = new Color32();
-			if(s == "default")
-				b = new Color32(13,103,196,255);
-			else if(s == "natural")
-				b = new Color32(73,95,157,255);
-			else if(s == "colorblind")
-				b = new Color32(0,0,240,255);
-			else if(s == "cga")
-				b = new Color32(0,0,170,255);
-			else if(s == "alternate")
-				b = new Color32(30,85,165,255);
-			return b;
+			if(s == "natural")
+				return new Color32(73,95,157,255);
+			if(s == "colorblind")
+				return new Color32(0,0,240,255);
+			if(s == "cga")
+				return new Color32(0,0,170,255);
+			if(s == "alternate")
+				return new Color32(30,85,165,255);
+			return new Color32(13,103,196,255);
 		}
 		public static Color Green(string s = "default") {
-			Color32 g = new Color32();
-			if(s == "default")
-				g = new Color32(68,158,53,255);
-			else if(s == "natural")
-				g = new Color32(89,117,55,255);
-			else if(s == "colorblind")
-				g = new Color32(0,128,0,255);
-			else if(s == "cga")
-				g = new Color32(0,170,0,255);
-			else if(s == "alternate")
-				g = new Color32(70,125,55,255);
-			return g;
+			if(s == "natural")
+				return new Color32(89,117,55,255);
+			if(s == "colorblind")
+				return new Color32(0,128,0,255);
+			if(s == "cga")
+				return new Color32(0,170,0,255);
+			if(s == "alternate")
+				return new Color32(70,125,55,255);
+			return new Color32(68,158,53,255);
 		}
 		public static Color Cyan(string s = "default") {
-			Color32 c = new Color32();
-			if(s == "default")
-				c = new Color32(86,163,205,255);
-			else if(s == "natural")
-				c = new Color32(101,144,158,255);
-			else if(s == "colorblind")
-				c = new Color32(0,112,144,255);
-			else if(s == "cga")
-				c = new Color32(0,170,170,255);
-			else if(s == "alternate")
-				c = new Color32(45,145,135,255);
-			return c;
+			if(s == "natural")
+				return new Color32(101,144,158,255);
+			if(s == "colorblind")
+				return new Color32(0,112,144,255);
+			if(s == "cga")
+				return new Color32(0,170,170,255);
+			if(s == "alternate")
+				return new Color32(45,145,135,255);
+			return new Color32(86,163,205,255);
 		}
 		public static Color Red(string s = "default") {
 			Color32 r = new Color32();
