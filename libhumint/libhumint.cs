@@ -711,11 +711,15 @@ namespace libhumint {
 	}
 }
 #endregion
-#region libhumint.RNG
-namespace libhumint.RNG {
-	public class RNG {
-		public RNG(int seed) {
-			
+#region libhumint.Dice
+namespace libhumint.Dice {
+	public static class Dice {
+		public static int Roll(int number, int sides) {
+			int val = 0;
+			for(int i = 0; i < number; i++) {
+				val += UnityEngine.Random.Range(1,sides + 1);
+			}
+			return val;
 		}
 	}
 }

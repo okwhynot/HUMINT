@@ -13,7 +13,8 @@ public class Object : MonoBehaviour {
 	public Player player;
 	public NPC npc;
 	public Item item;
-	
+	public Color objectColor;
+	public bool doesBlockMovement;
 	void Start() {
 		switch(objectType) {
 			case Type.Player: {
@@ -35,6 +36,7 @@ public class Object : MonoBehaviour {
 		public enum FACTION {SIS,CIA,Staasi,KGB,Civ};
 		public SEX sex;
 		public FACTION faction;
+		public GameObject EquippedWeapon;
 		public int health = 100;
 	}
 	
@@ -73,9 +75,9 @@ public class Object : MonoBehaviour {
 		public bool isHeld,doesStack,canPickUp;
 		public char graphic;
 		public Item() {
-			isHeld = false; //placeholder values
-			doesStack = true; //placeholder values
-			canPickUp = true; //placeholder values
+			//isHeld = false; //placeholder values
+			//doesStack = false; //placeholder values
+			//canPickUp = true; //placeholder values
 		}
 	}
 }
