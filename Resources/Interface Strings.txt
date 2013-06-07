@@ -35,7 +35,7 @@ summer = Summer
 autumn = Autumn
 winter = Winter
 # MAIN MENU
-ng_button = Enlist
+ng_button = START DEMO
 lg_button = Review Dossier
 am_button = Agent Memorial
 aa_button = Agency Archive

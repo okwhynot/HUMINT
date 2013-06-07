@@ -53,6 +53,8 @@ public class Action_Manager : MonoBehaviour {
 		if(targetobj != null)
 			Hit(targetobj.GetComponent<Object>(),damage);
 		wpn.GetComponent<Object>().item.curRounds -= 1;
+		if(targetobj != null)
+			MenuManager.combatLog = "Fired "+wpn.name+" at "+targetobj.name+" and hit!";
 	}
 	
 	public void Attack(GameObject obj, GameObject wpn) {
@@ -62,7 +64,8 @@ public class Action_Manager : MonoBehaviour {
 			return;
 		}
 		Object w = wpn.GetComponent<Object>();
-		
+		MenuManager.combatLog = "Hit "+obj.name+" with "+w.name+"!";
+		obj.GetComponent<Object>().npc.health -= UnityEngine.Random.Range(40,60);
 	}
 	
 	public void Punch(GameObject obj) {

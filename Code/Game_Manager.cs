@@ -37,18 +37,6 @@ public class Game_Manager : MonoBehaviour {
 		if(Input.GetKeyDown("4"))
 			Tick();
 		if(Input.GetKeyDown("=")) {
-			GameObject pMag = GameObject.Instantiate(GameObject.Find("9x18mm Makarov Magazine (G)")) as GameObject;
-			GameObject pGun = GameObject.Instantiate(GameObject.Find("Makarov PM (G)")) as GameObject;
-			pMag.name = pMag.GetComponent<Object>().name;
-			pMag.tag = "Item";
-			pMag.GetComponent<Object>().item.capacity = 10;
-			pMag.GetComponent<Object>().Coordinates = Player.GetComponent<Object>().Coordinates;
-			pMag.transform.parent = Player.transform;
-			pGun.name = pGun.GetComponent<Object>().name;
-			pGun.tag = "Item";
-			pGun.GetComponent<Object>().Coordinates = Player.GetComponent<Object>().Coordinates;
-			pGun.transform.parent = Player.transform;
-			Player.GetComponent<Object>().player.EquippedWeapon = pGun;
 			Tick();
 		}	
 	}

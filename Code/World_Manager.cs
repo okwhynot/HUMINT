@@ -368,6 +368,7 @@ public class World {
 		#region Decorate -- UNFINISHED
 		DecorateDungeon(grid, roomW, roomH);
 		PopulateDungeon(grid, roomW, roomH);
+		PopulateItems(grid, roomW, roomH);
 		#endregion
 	}
 	
@@ -706,7 +707,18 @@ public class World {
 	}
 	
 	void PopulateItems(Room[,] grid, int roomW, int roomH) {
-	
+		foreach(Transform child in GameObject.Find("Armory Parent").transform) {
+			Object o = child.gameObject.GetComponent<Object>();
+			float x = o.Coordinates.x + 1;
+			float y = o.Coordinates.y;
+			GameObject q = GameObject.Instantiate(GameObject.Find("9x18mm Makarov Magazine (G)")) as GameObject;
+			MonoBehaviour.DontDestroyOnLoad(q);
+			q.tag = "Item";
+			Object r = q.GetComponent<Object>();
+			q.name = r.name;
+			r.item.capacity = 10;
+			r.Coordinates = new Vector3(x,y,0);
+		}
 	}
 	#endregion
 	#region Overly ambitious world generator.
@@ -998,7 +1010,7 @@ public class World {
 				map[x,y,0].canMoveTo = !o.doesBlockMovement;
 				continue;
 			}
-			if(g.transform.parent != null)
+			if(g.transform.parent != null && (g.transform.parent.gameObject.tag == "Player" || g.transform.parent.gameObject.tag == "NPC"))
 				continue;	
 			map[x,y,0].tileContents.Add(g);
 			map[x,y,0].canMoveTo = !o.doesBlockMovement;

@@ -10,7 +10,7 @@
 	description: Soviet Union standard automatic pistol during Cold War
 	id: 23202
 	ammo: 9x18mm Makarov
-	damage: 3,6
+	damage: 5,7
 	cap: 10
 	attach:
 	color: 128,128,128
