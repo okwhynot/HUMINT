@@ -9,13 +9,30 @@ public class Action_Manager : MonoBehaviour {
 	public enum ACTIONSTATE {MOVE,ATTACK,CLOSE,OPEN,EXAMINE,LOOK,PICKUP};
 	public ACTIONSTATE state = ACTIONSTATE.MOVE;
 	public World_Manager WorldManager;
-	List<GameObject> npcs = new List<GameObject>();
+	public Menu_Manager MenuManager;
 	
 	public void Throw(int x0, int y0, int x1, int y1) {
 		
 	}
 	
-	public void Fire(int x0, int y0, int x1, int y1) {
+	public void Fire(int x0, int y0, int x1, int y1, GameObject wpn) {
+		Object wpnObject = wpn.GetComponent<Object>();
+		if(wpnObject.item.curRounds == 0) {
+			GameObject parent = wpn.transform.parent.gameObject;
+			Object parObj = parent.GetComponent<Object>();
+			GameObject[] inv = new GameObject[1];
+			if(parObj.objectType == Object.Type.NPC) {
+				inv = parObj.npc.inventory;
+			}
+			if(parObj.objectType == Object.Type.Player) {
+				inv = parObj.player.inventory;
+			}
+			Reload(inv,wpn);
+			return;
+		}
+		
+		int damage = UnityEngine.Random.Range(wpnObject.item.minDmg,wpnObject.item.maxDmg)*10;
+		Debug.Log(damage);
 		Line LoFire = new Line(x0,y0,x1,y1);
 		GameObject targetobj = null;
 		foreach(Line.Point p in LoFire.getPoints()) {
@@ -34,25 +51,58 @@ public class Action_Manager : MonoBehaviour {
 			}
 		}
 		if(targetobj != null)
-			Hit(targetobj.GetComponent<Object>(),Dice.Roll(6,2));
+			Hit(targetobj.GetComponent<Object>(),damage);
+		wpn.GetComponent<Object>().item.curRounds -= 1;
+	}
+	
+	public void Attack(GameObject obj, GameObject wpn) {
+		bool miss = (UnityEngine.Random.Range(0,100) < 30);
+		if(miss) {
+			MenuManager.combatLog = "Missed "+obj.name+"!";
+			return;
+		}
+		Object w = wpn.GetComponent<Object>();
+		
 	}
 	
 	public void Punch(GameObject obj) {
+		bool miss = (UnityEngine.Random.Range(0,100) < 30);
+		if(miss) {
+			MenuManager.combatLog = "Missed "+obj.name+"!";
+			return;
+		}
 		Object o = obj.GetComponent<Object>();
-		int dmg = Dice.Roll(6,2);
+		int dmg = Dice.Roll(8,2);
 		o.npc.health -= dmg;
-		bool blood = (UnityEngine.Random.Range(0,3) == 1);
+		int h = o.npc.health;
+		bool blood = (UnityEngine.Random.Range(0,6) == 1);
+		
 		if(blood) {
 			Hit(o,10);
 		}
 			
 		string[] locations = {"face","gut","arm","chest"};
-		Debug.Log("Hit "+o.name+" in the face for "+dmg+" damage! He now has "+o.npc.health+" health left.");
+		string cLog = "Punched "+o.name+" in the "+locations[UnityEngine.Random.Range(0,4)];
+		if(h < 0)
+			cLog += ", killing him!";
+		else
+			cLog +="!";
+		MenuManager.combatLog = cLog;
+	}
+	
+	public void PunchPlayer(GameObject obj) {
+		bool miss = (UnityEngine.Random.Range(0,100) < 40);
+		if(miss) {
+			return;
+		}
+		Object player = GameObject.FindWithTag("Player").GetComponent<Object>();
+		int dmg = Dice.Roll(4,2);
+		player.player.health -= dmg;
 	}
 	
 	public void Kill(GameObject obj) {
 		GameObject body = GameObject.Instantiate(Resources.Load("Object")) as GameObject;
-		body.name = obj.name + " (dead)";
+		body.name = obj.name + " (d)";
 		Object o = body.GetComponent<Object>();
 		Object o1 = obj.GetComponent<Object>();
 		o.display = o1.display;
@@ -68,8 +118,17 @@ public class Action_Manager : MonoBehaviour {
 		int z = (int)o.Coordinates.z;
 		//Debug.Log("Hit "+o.name+" @ "+x+","+y+","+z+" with WPNNAME for "+dmg +" damage.");
 		//WorldManager.world.map[x,y,z].tCDefault = ColorLib.Red("cga");
+		if(o.objectType == Object.Type.NPC) {
+			o.npc.health -= dmg;
+			Debug.Log(o.npc.health);
+		}
+		else if(o.objectType == Object.Type.Player) {
+			o.player.health -= dmg;
+			Debug.Log(o.player.health);
+		}
+		
 		GameObject blood = GameObject.Instantiate(Resources.Load("Object")) as GameObject;
-
+		
 		blood.name = "Blood";
 		blood.GetComponent<Object>().name = "Blood";
 		blood.GetComponent<Object>().display = "~";
@@ -78,10 +137,32 @@ public class Action_Manager : MonoBehaviour {
 		WorldManager.world.map[x,y,z].tileContents.Add(blood);
 	}
 	
-	void PickUpObject(int x, int y) {
-		if(WorldManager.world.map[x,y,0].tileContents.Count == 0) {
-			Debug.Log("nothing to pick up!");
-			
+	public void Reload(GameObject[] inventory, GameObject weapon) {
+		Object wpn = weapon.GetComponent<Object>();
+		string ammo = wpn.item.ammoType;
+		GameObject magazine = null;
+		foreach(GameObject item in inventory) {
+			Object o = item.GetComponent<Object>();
+			if(o.name.Contains(ammo) && o.item.itemType == Object.Item.Subtype.Ammo) {
+				Debug.Log("Has ammo.");
+				magazine = item;
+				break;
+			}
+		}
+		if(magazine == null) {
+			Debug.Log("No ammo.");
+			return;
+		}
+		wpn.item.curRounds = magazine.GetComponent<Object>().item.capacity;
+		Destroy(magazine);
+	}
+	
+	public void PickUpObject(int x, int y, GameObject obj) {
+		Object o = obj.GetComponent<Object>();
+		GameObject playerO = GameObject.FindWithTag("Player");
+		obj.transform.parent = playerO.transform;
+		if(playerO.GetComponent<Object>().player.EquippedWeapon == null && o.id.ToString()[1] == '3') {
+			playerO.GetComponent<Object>().player.EquippedWeapon = obj;
 		}
 	}
 }

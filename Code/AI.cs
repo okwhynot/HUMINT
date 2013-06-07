@@ -10,27 +10,112 @@ public class AI : MonoBehaviour {
 	Game_Manager GameManager;
 	Object thisObject,playerObject;
 	List<Line.Point> path = new List<Line.Point>();
-	
+	public bool hasPath = false;
+	Line.Point prevPoint;
 	int ind = 0;
-	
+	bool hasSeenPlayer = false;
+	List<Line.Point> visible = new List<Line.Point>();
 	void Awake() {
 		GameManager = GameObject.FindWithTag("Manager").GetComponent<Game_Manager>();
 		thisObject = this.gameObject.GetComponent<Object>();
 		playerObject = GameObject.Find("Player").GetComponent<Object>();
 	}
 	
-	void Start() {
-	
+	public bool canSeePlayer() {
+		int x = (int)playerObject.Coordinates.x;
+		int y = (int)playerObject.Coordinates.y;
+		int z = (int)playerObject.Coordinates.z;
+		foreach(Line.Point p in visible) {
+			if(p.x == x && p.y == y && p.z == z)
+				return true;
+		}
+		return false;
+		//return visible.Contains(pLoc);
 	}
 	
-	void Update() {
-		
+	public void CheckPlayerDist() {
+		CalculateFOV();
+		Line toPlayer = new Line((int)thisObject.Coordinates.x, (int)thisObject.Coordinates.y, (int)playerObject.Coordinates.x, (int)playerObject.Coordinates.y);
+		if(canSeePlayer() && hasSeenPlayer == false) {
+			hasSeenPlayer = true;
+			Pathfind();
+			FollowPath();
+		}
+		else if(thisObject.npc.EquippedWeapon != null && canSeePlayer() && hasSeenPlayer == true) {
+			Pathfind();
+			if(path.Count > 5) {
+				FollowPath();
+			}
+		}
+		else if(thisObject.npc.EquippedWeapon != null && canSeePlayer() == false && hasSeenPlayer == true) {
+			Pathfind();
+			FollowPath();
+		}
+		else if(thisObject.npc.EquippedWeapon == null && hasSeenPlayer && toPlayer.getPoints().Count < 10 && toPlayer.getPoints().Count > 2) {
+			Pathfind();
+			FollowPath();
+		}
+		else if(thisObject.npc.EquippedWeapon == null && hasSeenPlayer && toPlayer.getPoints().Count == 2 && canSeePlayer()) {
+			Action_Manager am = GameObject.Find("Logic Manager").GetComponent<Action_Manager>();
+			am.PunchPlayer(this.gameObject);
+		}	
 	}
 		
 	//Horizontal & vertical movement costs 10 points, diag costs 14.
 	//F = G + H
 	//H = the estimated movement cost to move from that given square to the end.
 	//OH, don't forget to add the whole "open" list and stuff. That's super important!
+	public void CalculateFOV() {
+		visible.Clear();
+		int radius = 5;
+		int ox = (int)thisObject.Coordinates.x;
+		int oy = (int)thisObject.Coordinates.y;
+		int mx = GameManager.WorldManager.world.map.GetLength(0);
+		int my = GameManager.WorldManager.world.map.GetLength(1);
+		//5 points in every direction
+		#region Sides
+		for(int y = -radius; y <= radius; y++) {
+			Line l = new Line(ox,oy,ox-radius,oy+y);
+			foreach(Line.Point point in l.getPoints()) {
+				if(point.x < 0 || point.y < 0 || point.x >= mx || point.y >= my)
+					continue;
+				if(GameManager.WorldManager.world.map[point.x,point.y,point.z].canSeeThrough == true) {
+					visible.Add(new Line.Point(point.x,point.y,point.z));
+				}
+			}
+			
+			l = new Line(ox,oy,ox+radius,oy+y);
+			foreach(Line.Point point in l.getPoints()) {
+				if(point.x < 0 || point.y < 0 || point.x >= mx || point.y >= my)
+					continue;
+				if(GameManager.WorldManager.world.map[point.x,point.y,point.z].canSeeThrough == true) {
+					visible.Add(new Line.Point(point.x,point.y,point.z));
+				}
+			}
+		}
+		#endregion
+		#region Front + back
+		for(int x = -radius; x <= radius; x++) {
+			Line l = new Line(ox,oy,ox+x,oy-radius);
+			foreach(Line.Point point in l.getPoints()) {
+				if(point.x < 0 || point.y < 0 || point.x >= mx || point.y >= my)
+					continue;
+				if(GameManager.WorldManager.world.map[point.x,point.y,point.z].canSeeThrough == true) {
+					visible.Add(new Line.Point(point.x,point.y,point.z));
+				}
+			}
+			l = new Line(ox,oy,ox+x,oy+radius);
+			foreach(Line.Point point in l.getPoints()) {
+				if(point.x < 0 || point.y < 0 || point.x >= mx || point.y >= my)
+					continue;
+				if(GameManager.WorldManager.world.map[point.x,point.y,point.z].canSeeThrough == true) {
+					visible.Add(new Line.Point(point.x,point.y,point.z));
+				}
+			}
+		}
+		#endregion
+	}
+	
 	public void Pathfind() {
 		path.Clear();
 		ind = 0;
@@ -92,7 +177,7 @@ public class AI : MonoBehaviour {
 		current = open.Peek();
 		if(current.x == end.x && current.y == end.y) {
 			Debug.Log("Successfully found path.");
-			Debug.Log (closed.Count);
+			//Debug.Log (closed.Count);
 			goto done;
 		}
 		_temp.Add(open.Peek());
@@ -109,7 +194,7 @@ public class AI : MonoBehaviour {
 		else if(curTry >= maxTries) {
 			Debug.Log ("Failed to find line.");
 			Debug.Log (closed.Count + " items in the closed list.");
-			
+			return;
 		}
 		#endregion
 		
@@ -129,11 +214,12 @@ public class AI : MonoBehaviour {
 		}
 		
 		foreach(Node no in closed) {
-			GameManager.WorldManager.world.map[no.x,no.y,no.z].tColor = ColorLib.Red("cga");
-			GameManager.WorldManager.world.map[no.x,no.y,no.z].tDefault = 'P';
+			//GameManager.WorldManager.world.map[no.x,no.y,no.z].tColor = ColorLib.Red("cga");
+			//GameManager.WorldManager.world.map[no.x,no.y,no.z].tDefault = 'P';
+			path.Add(new Line.Point(no.x,no.y,no.z));
 		}
-		GameManager.WorldManager.world.map[last.x,last.y,last.z].tColor = ColorLib.Yellow("cga");
-		GameManager.WorldManager.world.map[last.x,last.y,last.z].tDefault = 'E';
+		//GameManager.WorldManager.world.map[last.x,last.y,last.z].tColor = ColorLib.Yellow("cga");
+		//GameManager.WorldManager.world.map[last.x,last.y,last.z].tDefault = 'E';
 		#endregion
 	}
 	
@@ -164,37 +250,51 @@ public class AI : MonoBehaviour {
 	}
 	
 	public void FollowPath() {
-		if(ind == path.Count)
+		if(ind == path.Count) {
+			hasPath = false;
 			return;
-		thisObject.Coordinates = new Vector3(path[ind].x,path[ind].y,path[ind].z);
+		}
+		bool isd = GameManager.WorldManager.world.map[path[ind].x,path[ind].y,path[ind].z].isDoor;
+		bool iso = GameManager.WorldManager.world.map[path[ind].x,path[ind].y,path[ind].z].isOpen;
+		bool npc = GameManager.WorldManager.world.map[path[ind].x,path[ind].y,path[ind].z].npcPresent;
+		int thisIndex = Array.IndexOf(GameObject.FindGameObjectsWithTag("NPC"), this.gameObject);
+		if(npc)
+			return;
+		if(isd && iso == false) {
+			GameManager.WorldManager.world.map[path[ind].x,path[ind].y,path[ind].z].Open();
+			path.Insert(ind,path[ind]);
+			return;
+		}
+		if(isd == false || isd == true && iso == true)
+			thisObject.Coordinates = new Vector3(path[ind].x,path[ind].y,path[ind].z);
 		ind++;
 	}
 	
-	private bool ValidCoordinates(Node point) {
-		int x = point.x;
-		int y = point.y;
-		int z = point.z;
-		
-		if(x < 0)
-			return false;
-		if(y < 0)
-			return false;
-		if(z < 0)
-			return false;
-		if(x > GameManager.WorldManager.world.map.GetLength(0) - 1)
-			return false;
-		if(y > GameManager.WorldManager.world.map.GetLength(1) - 1)
-			return false;
-		if(z > GameManager.WorldManager.world.map.GetLength(2) - 1)
-			return false;
-		if(GameManager.WorldManager.world.map[x,y,z].canMoveTo == false)
-			return false;
-		if(path.Contains(point._this))
-			return false;
-		if(GameManager.WorldManager.world.map[x,y,z].isDoor && GameManager.WorldManager.world.map[x,y,z].isOpen == false)
-			return false;
-		return true;
-	}
+	//private bool ValidCoordinates(Node point) {
+	//	int x = point.x;
+	//	int y = point.y;
+	//	int z = point.z;
+	//	
+	//	if(x < 0)
+	//		return false;
+	//	if(y < 0)
+	//		return false;
+	//	if(z < 0)
+	//		return false;
+	//	if(x > GameManager.WorldManager.world.map.GetLength(0) - 1)
+	//		return false;
+	//	if(y > GameManager.WorldManager.world.map.GetLength(1) - 1)
+	//		return false;
+	//	if(z > GameManager.WorldManager.world.map.GetLength(2) - 1)
+	//		return false;
+	//	if(GameManager.WorldManager.world.map[x,y,z].canMoveTo == false)
+	//		return false;
+	//	if(path.Contains(point._this))
+	//		return false;
+	//	if(GameManager.WorldManager.world.map[x,y,z].isDoor && GameManager.WorldManager.world.map[x,y,z].isOpen == false)
+	//		return false;
+	//	return true;
+	//}
 	
 	class Node : IComparable<Node> {
 		public Line.Point _this;

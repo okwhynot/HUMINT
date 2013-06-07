@@ -302,8 +302,14 @@ public class World {
 							continue;
 						}
 					}
-					int rise = Math.Abs((int)grid[(int)v.x,(int)v.y].center.y - (int)r.center.y);
-					int run = Math.Abs((int)grid[(int)v.x,(int)v.y].center.x - (int)r.center.x);
+					if((int)v.x >= grid.GetLength(0) || (int)v.y >= grid.GetLength(1) || v.y < 0 || v.x < 0) {
+						Debug.Log("Adjacent room out of range, origin is "+r.x+","+r.y+".");
+						continue;
+					}
+					int gY = (int)grid[(int)v.x,(int)v.y].center.y;
+					int gX = (int)grid[(int)v.x,(int)v.y].center.x;
+					int rise = Math.Abs(gY - (int)r.center.y);
+					int run = Math.Abs(gX - (int)r.center.x);
 					if(rise != 0 && run != 0 && rise == run) {
 						Debug.Log(rise / run);
 						continue;
@@ -606,6 +612,8 @@ public class World {
 					x = (int)r.center.x;
 					ind = 0;
 					for(y = (int)r.center.y - 1 - (roomH - 1) / 2; y <= y1 + 2; y++) {
+						if(x < 0 || x >= map.GetLength(0) || y < 0 || y >= map.GetLength(1))
+							continue;
 						if(map[x,y,z].isDoor) {
 							map[x,y,z] = new Tile(x,y,z,(char)219,true,false,ColorLib.LightGray("cga"));
 							map[x,y,z].isDoor = true;
@@ -695,6 +703,10 @@ public class World {
 				GameObject.DontDestroyOnLoad(enemy);
 			}
 		}
+	}
+	
+	void PopulateItems(Room[,] grid, int roomW, int roomH) {
+	
 	}
 	#endregion
 	#region Overly ambitious world generator.
@@ -930,20 +942,19 @@ public class World {
 		}
 	}
 	
-	public void UpdateContents() {
-		
+	public void UpdateContents() {	
 		List<Vector3> locs = new List<Vector3>();
-		foreach(GameObject obj in Contents) {
-			if(obj == null)
-				continue;
-			Object o = obj.GetComponent<Object>();
-			Vector3 location = o.Coordinates;
-			locs.Add(location);
-			int x = (int)location.x;
-			int y = (int)location.y;
-			int z = (int)location.z;
-			map[x,y,z].tileContents.Add(obj);
-		}
+		//foreach(GameObject obj in Contents) {
+		//	if(obj == null)
+		//		continue;
+		//	Object o = obj.GetComponent<Object>();
+		//	Vector3 location = o.Coordinates;
+		//	locs.Add(location);
+		//	int x = (int)location.x;
+		//	int y = (int)location.y;
+		//	int z = (int)location.z;
+		//	map[x,y,z].tileContents.Add(obj);
+		//}
 		
 		int w = map.GetLength(0);
 		int l = map.GetLength(1);
@@ -977,6 +988,18 @@ public class World {
 			int x = (int)o.Coordinates.x;
 			int y = (int)o.Coordinates.y;
 				
+			if(o.name.Contains("(d)") && map[x,y,0].tileContents.Count > 0) {
+				if(map[x,y,0].tileContents[0].GetComponent<Object>().objectType != Object.Type.NPC) {
+					map[x,y,0].tileContents.Insert(0,g);
+				}
+				else {
+					map[x,y,0].tileContents.Insert(1,g);
+				}
+				map[x,y,0].canMoveTo = !o.doesBlockMovement;
+				continue;
+			}
+			if(g.transform.parent != null)
+				continue;	
 			map[x,y,0].tileContents.Add(g);
 			map[x,y,0].canMoveTo = !o.doesBlockMovement;
 		}

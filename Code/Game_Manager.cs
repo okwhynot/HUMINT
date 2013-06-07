@@ -12,6 +12,7 @@ public class Game_Manager : MonoBehaviour {
 	public World_Manager WorldManager;
 	public Action_Manager ActionManager;
 	public GameObject Player;
+	public int turnsPassed = 0;
 	
 	void Awake() {
 		foreach(GameObject npc in GameObject.FindGameObjectsWithTag("NPC")) {
@@ -36,13 +37,47 @@ public class Game_Manager : MonoBehaviour {
 		if(Input.GetKeyDown("4"))
 			Tick();
 		if(Input.GetKeyDown("=")) {
-			GameObject.FindWithTag("NPC").GetComponent<AI>().Pathfind();
+			GameObject pMag = GameObject.Instantiate(GameObject.Find("9x18mm Makarov Magazine (G)")) as GameObject;
+			GameObject pGun = GameObject.Instantiate(GameObject.Find("Makarov PM (G)")) as GameObject;
+			pMag.name = pMag.GetComponent<Object>().name;
+			pMag.tag = "Item";
+			pMag.GetComponent<Object>().item.capacity = 10;
+			pMag.GetComponent<Object>().Coordinates = Player.GetComponent<Object>().Coordinates;
+			pMag.transform.parent = Player.transform;
+			pGun.name = pGun.GetComponent<Object>().name;
+			pGun.tag = "Item";
+			pGun.GetComponent<Object>().Coordinates = Player.GetComponent<Object>().Coordinates;
+			pGun.transform.parent = Player.transform;
+			Player.GetComponent<Object>().player.EquippedWeapon = pGun;
 			Tick();
+		}	
+	}
+	
+	void UpdateInventory() {
+		List<GameObject> inventory = new List<GameObject>();
+		foreach(Transform child in Player.transform) {
+			inventory.Add(child.gameObject);
+		}
+		Player.GetComponent<Object>().player.inventory = inventory.ToArray();
+		foreach(GameObject NPC in GameObject.FindGameObjectsWithTag("NPC")) {
+			inventory = new List<GameObject>();
+			foreach(Transform child in NPC.transform)
+				inventory.Add(child.gameObject);
+			NPC.GetComponent<Object>().npc.inventory = inventory.ToArray();
+		}
+	}
+	
+	void UpdateAI() {
+		foreach(GameObject gobj in GameObject.FindGameObjectsWithTag("NPC")) {
+			AI ai = gobj.GetComponent<AI>();
+			ai.CheckPlayerDist();
 		}
 	}
 	
 	void Tick() {
-		//GameObject.FindWithTag("NPC").GetComponent<AI>().FollowPath();
+		turnsPassed++;
+		UpdateAI();
+		UpdateInventory();
 		FOV();
 		WorldManager.world.UpdateContents();
 		curDate = Clock(curDate, 0.1667);
@@ -137,13 +172,18 @@ public class Game_Manager : MonoBehaviour {
 			else if(Input.GetKeyDown("l"))
 				FlipActionState(5);
 			else if(Input.GetKeyDown("p")) {
-				if(WorldManager.world.map[px,py,pz].tileContents.Count > 1)
+				if(WorldManager.world.map[px,py,pz].tileContents.Count > 1) {
 					FlipActionState(6);
+				}
 				else if(WorldManager.world.map[px,py,pz].tileContents.Count == 1) {
-				
+					ActionManager.PickUpObject(px,py,WorldManager.world.map[px,py,pz].tileContents[0]);
+					Debug.Log(WorldManager.world.map[px,py,pz].tileContents[0].name);
 				}
 				else if(WorldManager.world.map[px,py,pz].tileContents.Count == 0)
 					Debug.Log("Nothing to pickup.");
+			}
+			else if(Input.GetKeyDown("r")) {
+				ActionManager.Reload(Player.GetComponent<Object>().player.inventory, Player.GetComponent<Object>().player.EquippedWeapon);
 			}
 			#region Move
 			if(CheckActionStates(0)) {//MOVE
@@ -152,32 +192,40 @@ public class Game_Manager : MonoBehaviour {
 						player.Coordinates.y -= 1;
 					else if(WorldManager.world.map[px,py-1,pz].isDoor && WorldManager.world.map[px,py-1,pz].isOpen == false)
 						WorldManager.world.map[px,py-1,pz].Open();
-					else if(WorldManager.world.map[px,py-1,pz].npcPresent)
+					else if(WorldManager.world.map[px,py-1,pz].npcPresent && player.player.EquippedWeapon == null)
 						ActionManager.Punch(WorldManager.world.map[px,py-1,pz].tileContents[0]);
+					else if(WorldManager.world.map[px,py-1,pz].npcPresent && player.player.EquippedWeapon != null)
+						ActionManager.Attack(WorldManager.world.map[px,py-1,pz].tileContents[0],player.player.EquippedWeapon);
 				}
 				else if(Input.GetKeyDown("down")) {
 					if(CheckCollision(px,py+1,pz))
 						player.Coordinates.y += 1;
 					else if(WorldManager.world.map[px,py+1,pz].isDoor && WorldManager.world.map[px,py+1,pz].isOpen == false)
 						WorldManager.world.map[px,py+1,pz].Open();
-					else if(WorldManager.world.map[px,py+1,pz].npcPresent)
+					else if(WorldManager.world.map[px,py+1,pz].npcPresent && player.player.EquippedWeapon == null)
 						ActionManager.Punch(WorldManager.world.map[px,py+1,pz].tileContents[0]);
+					else if(WorldManager.world.map[px,py+1,pz].npcPresent && player.player.EquippedWeapon != null)
+						ActionManager.Attack(WorldManager.world.map[px,py+1,pz].tileContents[0],player.player.EquippedWeapon);
 				}
 				else if(Input.GetKeyDown("left")) {
 					if(CheckCollision(px-1,py,pz) && px > 0)
 						player.Coordinates.x -= 1;
 					else if(WorldManager.world.map[px-1,py,pz].isDoor && WorldManager.world.map[px-1,py,pz].isOpen == false)
 						WorldManager.world.map[px-1,py,pz].Open();
-					else if(WorldManager.world.map[px-1,py,pz].npcPresent)
+					else if(WorldManager.world.map[px-1,py,pz].npcPresent && player.player.EquippedWeapon == null)
 						ActionManager.Punch(WorldManager.world.map[px-1,py,pz].tileContents[0]);
+					else if(WorldManager.world.map[px-1,py,pz].npcPresent && player.player.EquippedWeapon != null)
+						ActionManager.Attack(WorldManager.world.map[px-1,py,pz].tileContents[0],player.player.EquippedWeapon);
 				}
 				else if(Input.GetKeyDown("right")) {
 					if(CheckCollision(px+1,py,pz))
 						player.Coordinates.x += 1;
 					else if(WorldManager.world.map[px+1,py,pz].isDoor && WorldManager.world.map[px+1,py,pz].isOpen == false)
 						WorldManager.world.map[px+1,py,pz].Open();
-					else if(WorldManager.world.map[px+1,py,pz].npcPresent)
+					else if(WorldManager.world.map[px+1,py,pz].npcPresent && player.player.EquippedWeapon == null)
 						ActionManager.Punch(WorldManager.world.map[px+1,py,pz].tileContents[0]);
+					else if(WorldManager.world.map[px+1,py,pz].npcPresent && player.player.EquippedWeapon != null)
+						ActionManager.Attack(WorldManager.world.map[px+1,py,pz].tileContents[0],player.player.EquippedWeapon);
 				}
 			
 				if(Input.GetKeyDown("escape")) {
@@ -213,9 +261,9 @@ public class Game_Manager : MonoBehaviour {
 					int targetY = (int)MenuManager.cursorLoc.y - 7;
 					targetX += (int)player.Coordinates.x;
 					targetY += (int)player.Coordinates.y;
-					ActionManager.Fire((int)player.Coordinates.x, (int)player.Coordinates.y,targetX,targetY);
+					ActionManager.Fire((int)player.Coordinates.x, (int)player.Coordinates.y,targetX,targetY,player.player.EquippedWeapon);
 					FlipActionState(1);
-					Debug.Log(targetX +","+targetY);
+					Tick();
 				}
 			}
 			#endregion

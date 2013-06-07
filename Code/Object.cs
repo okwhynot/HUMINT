@@ -8,6 +8,7 @@ public class Object : MonoBehaviour {
 	public Vector3 Coordinates;
 	public Type objectType;
 	public string name;
+	public string desc;
 	public int id;
 	public string display;
 	public Player player;
@@ -15,27 +16,13 @@ public class Object : MonoBehaviour {
 	public Item item;
 	public Color objectColor;
 	public bool doesBlockMovement;
-	void Start() {
-		switch(objectType) {
-			case Type.Player: {
-				break;
-			}
-			case Type.Item: {
-				item = new Item();
-				break;
-			}
-			case Type.NPC: {
-				npc = new NPC();
-				break;
-			}
-		}
-	}
 	
 	public class Entity {
 		public enum SEX {Male,Female};
 		public enum FACTION {SIS,CIA,Staasi,KGB,Civ};
 		public SEX sex;
 		public FACTION faction;
+		public GameObject[] inventory;
 		public GameObject EquippedWeapon;
 		public int health = 100;
 	}
@@ -73,11 +60,12 @@ public class Object : MonoBehaviour {
 		public enum Subtype {WorldObject,Clothing,Weapon,Gadget,Ammo};
 		public Subtype itemType;
 		public bool isHeld,doesStack,canPickUp;
-		public char graphic;
+		public int minDmg,maxDmg;
+		public int capacity,curRounds;
+		public string ammoType;
+		
 		public Item() {
-			//isHeld = false; //placeholder values
-			//doesStack = false; //placeholder values
-			//canPickUp = true; //placeholder values
+		
 		}
 	}
 }

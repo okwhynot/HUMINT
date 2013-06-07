@@ -1,29 +1,32 @@
 {
 	name: Survival Knife
-	description: Military grade survival knife
 	id: 23101
+	description: Military grade survival knife
 	damage: 1,3
+	color: 139,119,101
 }
 {
 	name: Makarov PM
 	description: Soviet Union standard automatic pistol during Cold War
-	id: 23201
+	id: 23202
 	ammo: 9x18mm Makarov
 	damage: 3,6
+	cap: 10
 	attach:
+	color: 128,128,128
 }
 {
 	name: Walther PPK
 	description: Semi-automatic pistol built in 1929, used by James Bond
-	id: 23202
+	id: 23203
 	ammo: 7.65x17mm Browning SR (.32 ACP)
 	damage: 3,4
 	attach:
 }
 {
-	name: Walther P5 //design based off P38, basically a shiny newer version
+	name: Walther P5 #design based off P38, basically a shiny newer version
 	description: Semi-automatic pistol developed in the mid-1970s for German police forces
-	id: 23203
+	id: 23204
 	ammo: 9x19mm Parabellum
 	damage: 4,8
 	attach:
@@ -31,7 +34,7 @@
 {
 	name: Walther P38
 	description: Semi-automatic pistol developed at the beginning of World War II for the Wehrmacht to replace the Luger P08
-	id: 23204
+	id: 23205
 	ammo: 9×19mm Parabellum
 	damage: 4,7
 	attach:
@@ -39,7 +42,7 @@
 {
 	name: PSM
 	description: "Compact self-loading pistol" designed in 1969 for law enforcement and military officers of the USSR
-	id: 23205
+	id: 23206
 	ammo: 7.65x17mm Browning SR (.32 ACP)
 	damage: 3,5
 	attach:
@@ -47,7 +50,7 @@
 {
 	name: Sauer 38H
 	description: Semi-automatic pistol made in Germany in 1938 with an internal hammer
-	id: 23206
+	id: 23207
 	ammo: 5.45x18mm
 	damage: 2,4
 	attach:
@@ -55,21 +58,27 @@
 {
 	name: Tokarev TT-33
 	description: Semi-automatic pistol developed in the early 1930s for Soviet military to replace the M1895
-	id: 23207
+	id: 23208
 	ammo: 7.62x25mm Tokarev
 	damage: 3,4
 	attach:
 }
 {
-	name: Stechkin APS //uses shoulder stock
+	name: Stechkin APS #uses shoulder stock
 	description: Sidearm for the Soviet Army developed in 1951 for artillery soldiers tank crews, and aircraft personnel
-	id: 23208
+	id: 23209
 	ammo: 9x18mm Makarov
 	damage: 4,6
 	attach:
 }
 {
-	name: 5.45x18mm Mag
+	name: 9x18mm Makarov Magazine
+	description: 9x18mm Makarov Magazine
+	id: 25102
+	capacity: 10
+}
+{
+	name: 5.45x18mm Magazine
 	description: 18mm magazine
 	id: 25101
 	capacity: 12
@@ -102,4 +111,4 @@
 	prot: 1
 	weight: 3kg
 }
-//damagedone=damage(1-(totalprot/100))
+#damagedone=damage(1-(totalprot/100))
